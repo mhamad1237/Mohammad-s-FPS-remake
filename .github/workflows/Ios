@@ -1,0 +1,30 @@
+name: iOS build
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot + templates
+        run: |
+          V=4.7.2-stable
+          curl -L -o godot.zip https://github.com/godotengine/godot/releases/download/$V/Godot_v${V}_macos.universal.zip
+          curl -L -o tpz.zip https://github.com/godotengine/godot/releases/download/$V/Godot_v${V}_export_templates.tpz
+          unzip -q godot.zip
+          mkdir -p ~/Library/Application\ Support/Godot/export_templates/4.3.stable
+          unzip -q tpz.zip -d t && mv t/templates/* ~/Library/Application\ Support/Godot/export_templates/4.3.stable/
+      - name: Export Xcode project
+        run: |
+          mkdir -p build
+          ./Godot.app/Contents/MacOS/Godot --headless --export-release "iOS" build/game.xcodeproj
+      - name: Build unsigned
+        run: |
+          cd build
+          xcodebuild -project game.xcodeproj -scheme game -configuration Release \
+            -sdk iphoneos -derivedDataPath out CODE_SIGNING_ALLOWED=NO
+          mkdir Payload && cp -r out/Build/Products/Release-iphoneos/*.app Payload/
+          zip -r game.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: build/game.ipa
