@@ -25,14 +25,11 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if scope_material == null:
 		return
-
+	var holder := Global.weapon_holder
 	var ads := false
-
-	if is_multiplayer_authority() and is_instance_valid(Global.weapon_holder):
-		ads = Global.weapon_holder.is_ads
-
+	if is_instance_valid(holder) and holder.is_ancestor_of(self):
+		ads = holder.is_ads
 	_set_scope_active(ads)
-
 func _set_scope_active(active: bool, force := false) -> void:
 	if active == _scope_active and not force:
 		return

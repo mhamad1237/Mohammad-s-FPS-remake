@@ -4,8 +4,10 @@
 
 [node name="Line2D" type="Line2D" parent="." unique_id=1535689361]
 points = PackedVector2Array(256, 512, 256, 0)
+width = 6.0
 default_color = Color(0, 0, 0, 1)
 
 [node name="Line2D2" type="Line2D" parent="." unique_id=246921943]
 points = PackedVector2Array(512, 256, 0, 256)
+width = 6.0
 default_color = Color(0, 0, 0, 1)

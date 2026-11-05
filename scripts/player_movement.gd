@@ -3,25 +3,43 @@ extends CharacterBody3D
 # --- Movement constants ---
 const WALK_SPEED := 3.0
 const SPRINT_SPEED := 6.0
+@onready var hit_sound: AudioStreamPlayer = %HitSound
+const SHAKE_DECAY := 0.7          # trauma lost per second
+const SHAKE_MAX_OFFSET := 0.15    # camera h/v offset at full shake
+const SHAKE_MAX_ROLL := 0.04      # radians
+var _trauma := 0.0
+var _shake_roll_applied := 0.0
+const KICK_PITCH_DEG := 8.5
+const KICK_ROLL_DEG := 10.0
+const KICK_SNAP := 35.0      # how fast the view jumps to the kick
+const KICK_RECOVER := 7.0    # how fast it settles back
+@onready var damage_sound: AudioStreamPlayer = get_node_or_null("%DamageSound")
+var _kick_target := Vector2.ZERO    # x = pitch deg, y = roll deg
+var _kick_current := Vector2.ZERO
+var _kick_applied := Vector2.ZERO
+
 const CROUCH_SPEED := 1.5
 var _idle_frames : int = 0
 var target_position: Vector3 = Vector3.ZERO   # <--- Add this variable near the top with other vars
 const REMOTE_INTERPOLATION_DELAY := 0.10
 const MAX_REMOTE_SNAPSHOTS := 12
 const GRENADE_THROW_ACTION := "fire"   # change if your fire action is named differently
-
+var _tp_pre_posed := false
 var _grenade_equipped := false
 var _grenade_equipping := false
 var _remote_position_snapshots: Array[Dictionary] = []
 const GRENADE_EXPLOSION = preload(
 	"res://scenes/explosion.tscn"
 )
+const MAX_GRENADES := 3
+var grenade_count := MAX_GRENADES
+signal grenades_changed(count: int)
 var _has_triggered_start_step : bool = false
 const GRENADE_SHOT := "parameters/GrenadeShot/request"
 const GRENADE_FUSE := 3.5            # seconds from the moment you start cooking
 const GRENADE_FP_PAUSE_TIME := 0.15  # seconds into the FP grenade_throw
 const GRENADE_TP_PAUSE_TIME := 0.83   # seconds into the TP throw
-const GRENADE_THROW_SPEED := 15.0
+const GRENADE_THROW_SPEED := 25.0
 const GRENADE_RELEASE_TIME := 0.2    # seconds into the FP throw when it leaves the hand
 var _fp_held := false
 var _tp_held := false
@@ -65,13 +83,13 @@ const AIR_CONTROL := 2.0
 const GRAVITY := 20.0
 const JUMP_VELOCITY := 6.0
 const DEAD_ZONE := 0.15
-
+var debug_buttons: Array[Button] = []
 enum Stance { RIFLE, PISTOL }
 var stance: Stance = Stance.PISTOL
 
 @onready var tps_rig:Node3D = $ThirdPersonRig
 var camera_base_position: Vector3
-@onready var weapon_holder : Node3D = %WeaponHolder
+@onready var weapon_holder : WeaponHolder = %WeaponHolder
 @onready var camera:Camera3D = $CameraPivot/Camera3D
 var last_frame_was_on_floor := -INF
 @onready var anim_tree : AnimationTree = $ThirdPersonRig/mesh/model/AnimationTree
@@ -84,7 +102,7 @@ const CROUCHING_HEIGHT := 1.162
 const CROUCH_WALKING_HEIGHT := 1.374
 const AIR_HEIGHT := 1.3
 const STEP_TREAD_MIN_Y := 0.98  # tread normal must be nearly flat
-
+var _tp_pre_pose_msec := 0
 const COLLISION_BOTTOM := 0.0
 @onready var stairs_below_raycast: RayCast3D = $StairsBelowRayCast3D
 @onready var stairs_ahead_raycast: RayCast3D = $StairsAheadRayCast3D
@@ -184,7 +202,9 @@ func _ready() -> void:
 	else:
 		target_position = global_position
 		camera.current = false
+		tps_rig.show()
 		weapon_holder.hide()
+		weapon_holder.grenade_arms.hide()
 		set_physics_process(false)
 		call_deferred("_init_walking_animation")
 	set_collision("standing")
@@ -205,6 +225,7 @@ func _add_debug_kill_button() -> void:
 	var layer := CanvasLayer.new()
 	layer.layer = 90
 	add_child(layer)
+
 	var b := Button.new()
 	b.text = "KILL ME"
 	b.position = Vector2(20, 120)
@@ -213,6 +234,48 @@ func _add_debug_kill_button() -> void:
 		if not is_dead:
 			_server_apply_damage(MAX_DAMAGE_PER_HIT, 0))
 	layer.add_child(b)
+	debug_buttons.append(b)
+
+	# Directional damage kick tests (offsets are relative to the player)
+	var tests := {
+		"FRONT": Vector3(0, 0, -5),
+		"BEHIND": Vector3(0, 0, 5),
+		"LEFT": Vector3(-5, 0, 0),
+		"RIGHT": Vector3(5, 0, 0),
+	}
+	var y := 120.0
+	for label in tests:
+		var offset: Vector3 = tests[label]
+		var tb := Button.new()
+		tb.text = "HIT " + label
+		tb.position = Vector2(200, y)
+		tb.custom_minimum_size = Vector2(160, 60)
+		debug_buttons.append(tb)
+		tb.pressed.connect(func() -> void:
+			if is_dead:
+				return
+			var src := global_position + global_transform.basis * offset
+			_server_apply_damage(20.0, 99, false, src)
+			# Heal back so you can test repeatedly
+			health = max_health
+			health_changed.emit(health, max_health))
+		layer.add_child(tb)
+		y += 70.0
+
+	# Screen shake test
+	var sb := Button.new()
+	sb.text = "SHAKE"
+	sb.position = Vector2(200, y)
+	sb.custom_minimum_size = Vector2(160, 60)
+	sb.pressed.connect(func() -> void: add_shake(0.9))
+	layer.add_child(sb)
+	debug_buttons.append(sb)
+func set_debug_buttons_visible(on: bool) -> void:
+	for b in debug_buttons:
+		if is_instance_valid(b):
+			b.visible = on
+		else:
+			print("cooked")
 func _update_remote_position() -> void:
 	var snapshots := _remote_position_snapshots
 
@@ -269,9 +332,11 @@ func _process(delta: float) -> void:
 	if not is_multiplayer_authority():
 		_remote_anim(delta)
 		_update_remote_position()
+		_update_footsteps()
 		return
 	_update_footsteps()
 	process_input()
+
 
 	if is_moving:
 		# Mute them completely when moving
@@ -309,6 +374,37 @@ func _process(delta: float) -> void:
 
 	_set_pivot_position()
 	update_cam_recoil(delta)
+	_update_shake(delta)
+	_update_damage_kick(delta)
+func _damage_feedback(src: Vector3, dmg: float,is_grenade:bool) -> void:
+	if!is_grenade:
+		damage_sound.pitch_scale = randf_range(0.8,1.2)
+		damage_sound.play()
+	else:
+		await get_tree().create_timer(0.25).timeout
+		$EarEcho.play()
+
+
+	var strength := clampf(dmg / 40.0, 0.35, 1.0)
+	var pitch := 0.3   # small upward flinch if the direction is unknown
+	var roll := 0.0
+	if src != Vector3.INF:
+		var flat := src - global_position
+		flat.y = 0.0
+		if flat.length() > 0.1:
+			var local := global_transform.basis.inverse() * flat.normalized()
+			pitch = -local.z * 0.7 + 0.3   # front = view snaps up, behind = dips
+			roll = local.x                 # right = tilts left, left = tilts right
+	_kick_target += Vector2(pitch * KICK_PITCH_DEG, roll * KICK_ROLL_DEG) * strength
+	_kick_target = _kick_target.clamp(Vector2(-12, -12), Vector2(12, 12))
+
+
+func _update_damage_kick(delta: float) -> void:
+	_kick_target = _kick_target.lerp(Vector2.ZERO, clampf(KICK_RECOVER * delta, 0.0, 1.0))
+	_kick_current = _kick_current.lerp(_kick_target, clampf(KICK_SNAP * delta, 0.0, 1.0))
+	camera.rotation.x += deg_to_rad(_kick_current.x - _kick_applied.x)
+	camera.rotation.z += deg_to_rad(_kick_current.y - _kick_applied.y)
+	_kick_applied = _kick_current
 func _loco_name() -> String:
 	return "LocoPistol" if stance == Stance.PISTOL else "LocoRifle"
 
@@ -630,6 +726,9 @@ func has_valid_landing_surface() -> bool:
 	var distance := global_position.y - hit_point.y
 
 	return distance >= 0.0 and distance <= 0.15
+func play_hit_sound() -> void:
+	if hit_sound:
+		hit_sound.play()
 func enter_air() -> void:
 	# Jumping or falling cancels sprint (sprint is a toggle)
 	if is_sprinting:
@@ -1041,23 +1140,38 @@ func _request_damage(amount: float) -> void:
 	if not multiplayer.is_server():
 		return
 	_server_apply_damage(amount, multiplayer.get_remote_sender_id())
-
-func _server_apply_damage(amount: float, attacker_id: int, allow_self := false) -> void:
+func _server_apply_damage(amount: float, attacker_id: int, allow_self := false, source_pos := Vector3.INF,is_grenade:bool = false) -> void:
 	if is_dead:
 		return
 	if attacker_id == get_multiplayer_authority() and not allow_self:
 		return
-	health = maxf(health - clampf(amount, 0.0, MAX_DAMAGE_PER_HIT), 0.0)
-	_apply_health.rpc(health, attacker_id)
+	var new_health := maxf(health - clampf(amount, 0.0, MAX_DAMAGE_PER_HIT), 0.0)
 
+	var src := source_pos
+	if src == Vector3.INF:
+		var a := NetworkManager.get_player_node(attacker_id) as Node3D
+		if a:
+			src = a.global_position
+	_apply_health.rpc(new_health, attacker_id, src,is_grenade)
 # Server -> everyone (including itself)
 @rpc("any_peer", "call_local", "reliable")
-func _apply_health(new_health: float, attacker_id: int) -> void:
+func _apply_health(new_health: float, attacker_id: int, src: Vector3,is_grenade:bool) -> void:
 	var sender := multiplayer.get_remote_sender_id()
 	if sender != 1 and sender != 0:
-		return  # only the server may set health
+		return
+	var dmg := health - new_health
 	health = new_health
 	health_changed.emit(health, max_health)
+
+	if dmg > 0.0:
+		if attacker_id == multiplayer.get_unique_id() \
+		and attacker_id != get_multiplayer_authority() \
+		and is_instance_valid(Global.player):
+			Global.player.play_hit_sound()
+		if is_multiplayer_authority() and health > 0.0:
+			_damage_feedback(src, dmg,is_grenade)
+
+
 	if health <= 0.0 and not is_dead:
 		_die(attacker_id)
 func _die(attacker_id: int) -> void:
@@ -1073,7 +1187,8 @@ func _die(attacker_id: int) -> void:
 	current_collision_mode = ""
 	if is_multiplayer_authority():
 		cancel_grenade()
-		tps_rig.skeletonIK.start()
+		_set_ik(true)
+		
 		set_physics_process(false)
 		weapon_holder.hide()
 		is_crouching = false
@@ -1091,6 +1206,7 @@ func _die(attacker_id: int) -> void:
 		if loco:
 			loco.travel("walking")
 	else:
+		
 		tps_rig.hide()
 	# Owner sees a countdown, then gets the buttons
 	if is_multiplayer_authority():
@@ -1179,7 +1295,8 @@ func _respawn(pos: Vector3) -> void:
 		set_physics_process(true)
 		weapon_holder.show()
 		weapon_holder.apply_loadout_on_respawn()   # new
-
+		grenade_count = MAX_GRENADES
+		grenades_changed.emit(grenade_count)
 		snapped_to_stairs_last_frame = false
 
 		camera.position.y = 1.513
@@ -1267,7 +1384,7 @@ func _play_footstep() -> void:
 	
 	# Determine pitch multiplier based on movement state
 	var pitch_mult := 0.9
-	if is_sprinting:
+	if sync_sprinting:
 		pitch_mult = 1.35  # Higher pitch for faster/harder steps
 
 	p.volume_db = -10
@@ -1288,7 +1405,6 @@ func toggle_grenade() -> void:
 		_unequip_grenade()
 	else:
 		_try_equip_grenade()
-
 func _try_equip_grenade() -> void:
 	if _throwing or _grenade_equipping or _grenade_equipped:
 		return
@@ -1296,57 +1412,54 @@ func _try_equip_grenade() -> void:
 		return
 	if weapon_holder.is_reloading or weapon_holder.is_ads:
 		return
+	if grenade_count <= 0:
+		return
 
 	_grenade_equipping = true
 	_throw_id += 1
 	var id := _throw_id
+
 	is_sprinting = false
 	Input.action_release("sprint")
 
+	# Start the TP animation immediately.
+	_tp_pre_pose()
+
+	# Hide the weapon.
 	await weapon_holder.play_weapon_anim("hide")
 	if id != _throw_id:
 		return
+
+	# Show grenade arms without waiting for a ready animation.
 	weapon_holder.show_grenade_arms()
+
 	_grenade_equipped = true
 	_grenade_equipping = false
-
 func _unequip_grenade() -> void:
 	if _throwing or _grenade_equipping or not _grenade_equipped:
 		return
 	_grenade_equipped = false
+	_tp_clear_pose()
+	_set_hand(false, true)
+	_set_ik(true)
 	_grenade_equipping = true   # blocks re-equipping until the equip anim finishes
 	_throw_id += 1
 	var id := _throw_id
 	await weapon_holder.unequip_grenade()
 	if id == _throw_id:
 		_grenade_equipping = false
-
 func cancel_grenade() -> void:
 	_throw_id += 1
 	_throwing = false
 	_grenade_equipped = false
 	_grenade_equipping = false
 	_fp_held = false
-	_tp_held = false
 	if grenade_label:
 		grenade_label.hide()
 	weapon_holder.reset_grenade_fp()
+	weapon_holder.reset_grenade_fp_anim()
 	weapon_holder.hide_grenade_arms()
-	set_grenade_tp_hold(false)
-	anim_tree.set("parameters/GrenadeShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
-	_set_hand(false, true)   # grenade away, weapon back (synced to other peers)func cancel_grenade() -> void:
-	_throw_id += 1
-	_throwing = false
-	_grenade_equipped = false
-	_grenade_equipping = false
-	_fp_held = false
-	_tp_held = false
-	if grenade_label:
-		grenade_label.hide()
-	weapon_holder.reset_grenade_fp()
-	weapon_holder.hide_grenade_arms()
-	set_grenade_tp_hold(false)
-	anim_tree.set("parameters/GrenadeShot/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
+	_tp_clear_pose()   # replaces the old set_grenade_tp_hold + ABORT lines
 	_set_hand(false, true)   # grenade away, weapon back (synced to other peers)
 
 func _throw_held() -> bool:
@@ -1354,7 +1467,7 @@ func _throw_held() -> bool:
 
 
 func _try_throw_grenade() -> void:
-	if _throwing or not _grenade_equipped:
+	if _throwing or _grenade_equipping or not _grenade_equipped:
 		return
 	if is_dead or is_airborne or is_landing:
 		return
@@ -1363,32 +1476,37 @@ func _try_throw_grenade() -> void:
 
 	_throwing = true
 	_grenade_equipped = false
-
-	tps_rig.skeletonIK.stop()
+	grenade_count -= 1
+	grenades_changed.emit(grenade_count)
 	_throw_id += 1
 	var id := _throw_id
 	_fp_held = false
-	_tp_held = false
+	var pre_posed := _tp_pre_posed   # keep _tp_held as is
+	if not pre_posed:
+		_tp_held = false
+		_set_ik(false)
 	is_sprinting = false
 	Input.action_release("sprint")
 
 	# Arms are already showing from equip, so just start the throw anims
 	weapon_holder.start_grenade_fp()
-	play_grenade_tp()
-	_set_hand(true, false) 
-	sync_grenade_throw.rpc()
+	if not pre_posed:
+		play_grenade_tp()
+		_set_hand(true, false)
+		sync_grenade_throw.rpc()
+	_tp_pre_posed = false
 
 	get_tree().create_timer(GRENADE_FP_PAUSE_TIME).timeout.connect(func() -> void:
 		if id == _throw_id and _throw_held():
 			weapon_holder.hold_grenade_fp(GRENADE_FP_PAUSE_TIME)
 			_fp_held = true)
 
-	get_tree().create_timer(GRENADE_TP_PAUSE_TIME).timeout.connect(func() -> void:
-		if id == _throw_id and _throw_held():
-			set_grenade_tp_hold(true)
-			sync_grenade_hold.rpc(true)
-			_tp_held = true)
-
+	if not pre_posed:
+		get_tree().create_timer(GRENADE_TP_PAUSE_TIME).timeout.connect(func() -> void:
+			if id == _throw_id and _throw_held():
+				set_grenade_tp_hold(true)
+				sync_grenade_hold.rpc(true)
+				_tp_held = true)
 	# Wait for both pause points, but stop early if the button is released
 	var t := 0.0
 	var wait := maxf(GRENADE_FP_PAUSE_TIME, GRENADE_TP_PAUSE_TIME) + 0.05
@@ -1436,7 +1554,7 @@ func _try_throw_grenade() -> void:
 	if id == _throw_id:
 		_throwing = false
 		_set_hand(false, true)      # weapon back
-		tps_rig.skeletonIK.start()
+		_set_ik(true)
 func _on_grenade_release(fuse_left: float) -> void:
 	_set_hand(false, false)
 	var t := camera.global_transform
@@ -1490,3 +1608,58 @@ func sync_hand(grenade: bool, weapon: bool) -> void:
 @rpc("authority", "call_remote", "reliable")
 func sync_grenade_hold(on: bool) -> void:
 	set_grenade_tp_hold(on)
+func _set_ik(on: bool) -> void:
+	if on:
+		tps_rig.skeletonIK.start()
+	else:
+		tps_rig.skeletonIK.stop()
+	if multiplayer.has_multiplayer_peer():
+		sync_ik.rpc(on)
+
+
+@rpc("authority", "call_remote", "reliable")
+func sync_ik(on: bool) -> void:
+	if on:
+		tps_rig.skeletonIK.start()
+	else:
+		tps_rig.skeletonIK.stop()
+func _tp_pre_pose() -> void:
+	var id := _throw_id
+	_tp_pre_posed = true
+	_tp_pre_pose_msec = Time.get_ticks_msec()
+	_tp_held = false
+	_set_ik(false)
+	_set_hand(true, false)
+	play_grenade_tp()
+	sync_grenade_throw.rpc()
+	get_tree().create_timer(GRENADE_TP_PAUSE_TIME).timeout.connect(func() -> void:
+		if id == _throw_id and _grenade_equipped:
+			set_grenade_tp_hold(true)
+			sync_grenade_hold.rpc(true)
+			_tp_held = true)
+
+
+func _tp_clear_pose() -> void:
+	_tp_pre_posed = false
+	_tp_held = false
+	set_grenade_tp_hold(false)
+	anim_tree.set(GRENADE_SHOT, AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
+	sync_grenade_cancel.rpc()
+
+
+@rpc("authority", "call_remote", "reliable")
+func sync_grenade_cancel() -> void:
+	set_grenade_tp_hold(false)
+	anim_tree.set(GRENADE_SHOT, AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
+func add_shake(amount: float) -> void:
+	_trauma = minf(_trauma + amount, 1.0)
+
+
+func _update_shake(delta: float) -> void:
+	_trauma = move_toward(_trauma, 0.0, SHAKE_DECAY * delta)
+	var s := _trauma * _trauma   # squared, so weak shakes stay subtle
+	camera.h_offset = randf_range(-1.0, 1.0) * SHAKE_MAX_OFFSET * s
+	camera.v_offset = randf_range(-1.0, 1.0) * SHAKE_MAX_OFFSET * s
+	var roll := randf_range(-1.0, 1.0) * SHAKE_MAX_ROLL * s
+	camera.rotation.z += roll - _shake_roll_applied   # same add/subtract pattern as your recoil
+	_shake_roll_applied = roll

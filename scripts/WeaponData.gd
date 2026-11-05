@@ -15,6 +15,8 @@ const NO_SCOPE_NAME := "no_scope"
 ## Display
 @export var weapon_name: String = ""
 @export var icon: Texture2D
+@export var icon_pos: Vector2
+@export var icon_size: Vector2
 @export var type : String
 ## Firing stats
 @export var fire_rate: float = 0.1
@@ -22,7 +24,9 @@ const NO_SCOPE_NAME := "no_scope"
 @export var magazine_size: int = 30
 @export var accuracy_multiplier : float = 1
 @export var is_shotgun: bool = false
+@export var SHELL_INSERT_AT := 0.6   # fraction of the clip where the shell goes in
 @export var pellet_count: int = 8  # only used if is_shotgun
+@export var pellet_spread_degrees: float = 3.0  # only used if is_shotgun
 @export var is_semi_auto: bool = false
 ## Falloff
 @export var falloff_start: float = 20.0
@@ -53,7 +57,6 @@ const NO_SCOPE_NAME := "no_scope"
 @export var default_no_scope: bool = false
 
 @export var clip_ray_length : float
-
 func get_scope_count() -> int:
 	return available_scopes.size()
 

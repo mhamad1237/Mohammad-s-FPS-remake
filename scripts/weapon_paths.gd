@@ -1,6 +1,7 @@
 extends Node
 
 const _PATHS := {
+	"benelli_m4": "res://weapon_resources/benelli_m4.tres",
 	"makarov_pistol": "res://weapon_resources/makarov_pistol.tres",
 	"ak47": "res://weapon_resources/ak47.tres",
 }
@@ -15,3 +16,6 @@ var ak47: WeaponData:
 var makarov_pistol: WeaponData:
 	get:
 		return get_data("makarov_pistol")
+var benelli_m4: WeaponData:
+	get:
+		return get_data("benelli_m4")

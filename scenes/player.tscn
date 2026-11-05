@@ -4,15 +4,18 @@
 [ext_resource type="PackedScene" uid="uid://b7mdq36q1bvwm" path="res://scenes/gas_mask.tscn" id="2_fjrip"]
 [ext_resource type="AudioStream" uid="uid://c4248qcotd4sj" path="res://sounds/cs-go-headshot-sound.mp3" id="2_ur7pv"]
 [ext_resource type="Script" uid="uid://dm8mkvee2nl5r" path="res://scripts/WeaponHolder.gd" id="3_tuyoq"]
-[ext_resource type="PackedScene" uid="uid://bjl7mq13gtdsu" path="res://scenes/ak_47.tscn" id="4_fjrip"]
 [ext_resource type="AudioStream" uid="uid://dd04p4r7hb78y" path="res://sounds/hitmarker_2.mp3" id="5_3v2ag"]
 [ext_resource type="PackedScene" uid="uid://dt2ogsgc4lej7" path="res://scenes/grenade_arms.tscn" id="5_jej6c"]
+[ext_resource type="PackedScene" uid="uid://cexitlm80xya2" path="res://scenes/benelli_m4.tscn" id="5_oprun"]
 [ext_resource type="Script" uid="uid://ba01d02lwt0pg" path="res://scripts/third_person_rig.gd" id="5_tuyoq"]
+[ext_resource type="Animation" uid="uid://ddfdm4mfumxwf" path="res://animations/arms/grenade_throw.res" id="6_a8ls1"]
 [ext_resource type="PackedScene" uid="uid://db4vd2isl5vb1" path="res://assets/BinbunVFX/muzzle_flash/effects/big_flash/muzzle_flash.tscn" id="6_oprun"]
 [ext_resource type="Script" uid="uid://cjmmhbp1b5312" path="res://addons/StyleboxFancy/StyleBorder.gd" id="8_ur7pv"]
 [ext_resource type="Script" uid="uid://bkl6g25jwb47h" path="res://addons/StyleboxFancy/StyleBoxFancy.gd" id="9_y4r1p"]
 [ext_resource type="AudioStream" uid="uid://juw0qq8h8bev" path="res://sounds/hasin2004-breathing-fast-247449.mp3" id="10_y4r1p"]
 [ext_resource type="AudioStream" uid="uid://ircd1wbobvir" path="res://sounds/soundreality-wind-blowing-457954.mp3" id="11_d2wvv"]
+[ext_resource type="AudioStream" uid="uid://osnynl8nlikq" path="res://sounds/Ear echo.mp3" id="15_oprun"]
+[ext_resource type="AudioStream" uid="uid://bepi0m2cdq5jh" path="res://sounds/getting_hit.mp3" id="15_qfm1y"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gyc6d"]
 radius = 0.26220703
@@ -80,13 +83,45 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [75.0, 55.0]
+"values": [75.0, 50.0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_tuyoq"]
 _data = {
 &"zoom_in_2x_scope": SubResource("Animation_fjrip"),
 &"zoom_in_no_scope": SubResource("Animation_qlg0r")
+}
+
+[sub_resource type="Animation" id="Animation_qfm1y"]
+length = 0.19999999999999998
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.094, -0.22768867, -0.14715661), Vector3(-0.0011397079, -0.18089223, 0.145)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("%WeaponHolder/..:fov")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [75.0, 40.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fulsm"]
+_data = {
+&"zoom_in_no_scope": SubResource("Animation_qfm1y")
 }
 
 [sub_resource type="Animation" id="Animation_smehm"]
@@ -113,12 +148,17 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [75.0, 60.0]
+"values": [75.0, 50.0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ur7pv"]
 _data = {
 &"zoom_in_no_scope": SubResource("Animation_smehm")
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_60mlk"]
+_data = {
+&"grenade_throw": ExtResource("6_a8ls1")
 }
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_fjrip"]
@@ -271,48 +311,99 @@ current = true
 size = 0.647
 near = 0.01
 
-[node name="WeaponHolder" type="Node3D" parent="CameraPivot/Camera3D" unique_id=859068272 node_paths=PackedStringArray("wall_check_ray", "recoil_pivot", "bob_pivot", "animation_player")]
+[node name="WeaponHolder" type="Node3D" parent="CameraPivot/Camera3D" unique_id=859068272 node_paths=PackedStringArray("grenade_arms", "grenade_attachment", "wall_check_ray", "recoil_pivot", "bob_pivot", "animation_player")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.094, -0.247, -0.17)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.094, -0.22768867, -0.14715661)
 script = ExtResource("3_tuyoq")
+grenade_arms = NodePath("../grenade_arms")
+grenade_attachment = NodePath("../grenade_arms/GrenadeAttachment")
 debug_draw_rays = false
 wall_check_ray = NodePath("../WallCheckRayCast3D")
 recoil_pivot = NodePath("BobPivot/RecoilPivot")
 bob_pivot = NodePath("BobPivot")
 animation_player = NodePath("AnimationPlayer")
 
-[node name="grenade_arms" parent="CameraPivot/Camera3D/WeaponHolder" unique_id=2054167381 instance=ExtResource("5_jej6c")]
-transform = Transform3D(-0.01, 0, -8.7422775e-10, 0, 0.01, 0, 8.7422775e-10, 0, -0.01, 0, 0.18834984, -0.31455106)
-visible = false
-
-[node name="model" parent="CameraPivot/Camera3D/WeaponHolder/grenade_arms" index="0" unique_id=332851641]
-transform = Transform3D(1, 0, 7.1054274e-15, 0, 1, 0, -7.1054274e-15, 0, 1, 1.9073486e-06, 0, -26.449665)
-
-[node name="GrenadeAttachment" parent="CameraPivot/Camera3D/WeaponHolder/grenade_arms" index="1" unique_id=1274305953]
-transform = Transform3D(-0.7276169, -0.47501537, -0.49490827, -0.57768, 0.8133731, 0.06862933, 0.36994523, 0.33583444, -0.866231, -13.923503, -8.528336, -32.503883)
-
-[node name="Grenade" parent="CameraPivot/Camera3D/WeaponHolder/grenade_arms/GrenadeAttachment" index="0" unique_id=110403833]
-visible = true
-
 [node name="BobPivot" type="Node3D" parent="CameraPivot/Camera3D/WeaponHolder" unique_id=876783525]
 
 [node name="RecoilPivot" type="Node3D" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot" unique_id=1778830066]
 
-[node name="weapon" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot" unique_id=1673703102 instance=ExtResource("4_fjrip")]
+[node name="weapon" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot" unique_id=1132056922 instance=ExtResource("5_oprun")]
 
-[node name="ScopeMount" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot/weapon" index="2" unique_id=534826225]
-transform = Transform3D(0.009999992, -8.742284e-10, 8.7422725e-10, 8.742272e-10, 0.010000007, -4.3711348e-10, -8.74227e-10, 4.371142e-10, 0.009999992, 0.004318662, 0.18189585, -0.13066417)
+[node name="Skeleton3D" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot/weapon/model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4" parent_id_path=PackedInt32Array(1132056922, 2105025039, 220048450) index="0" unique_id=619822455]
+bones/1/position = Vector3(23.380886, 4.552367, -8.66666)
+bones/1/rotation = Quaternion(-0.5023952, 0.8072712, 0.24348502, 0.19138242)
+bones/2/rotation = Quaternion(0.6191685, -0.15397283, 0.57565147, 0.51141775)
+bones/3/rotation = Quaternion(-0.15577143, 0.08909809, -5.820766e-10, 0.9837667)
+bones/4/rotation = Quaternion(0.31681794, 0.074327715, -0.21995705, 0.9196307)
+bones/5/rotation = Quaternion(-0.21150593, 0.0972238, -0.10278143, 0.9670826)
+bones/8/rotation = Quaternion(-0.1395252, -0.16534306, 0.44989768, 0.86647934)
+bones/9/rotation = Quaternion(-0.04345627, -0.4733656, 0.0035340148, 0.8797864)
+bones/10/rotation = Quaternion(-0.031492777, -0.14205636, -0.004521921, 0.98934716)
+bones/12/rotation = Quaternion(0.08655291, -0.5011706, 0.40245134, 0.76116323)
+bones/13/rotation = Quaternion(0.022247966, -0.18803151, 0.004579015, 0.98190033)
+bones/14/rotation = Quaternion(-0.011767514, -0.21838225, -0.0006765736, 0.97579217)
+bones/16/rotation = Quaternion(-0.4615759, 0.88279706, -0.052115407, 0.070007704)
+bones/17/rotation = Quaternion(0.029620629, 0.8370957, 0.07869159, 0.5405562)
+bones/18/rotation = Quaternion(0.05117318, -0.24259397, 0.012980913, 0.96869034)
+bones/21/rotation = Quaternion(0.17706037, 0.77471983, 0.11370845, 0.59626275)
+bones/22/rotation = Quaternion(-0.021291735, -0.16856332, -0.0034913504, 0.9854547)
+bones/23/rotation = Quaternion(0.022323426, -0.008567826, 0.013147474, 0.99962765)
+bones/25/position = Vector3(-1.0158278, 6.5953035, -48.53924)
+bones/25/rotation = Quaternion(0.69810325, 0.53994644, 0.45968714, 0.09898205)
+bones/26/rotation = Quaternion(0.7552082, -0.1844206, -0.22236766, 0.5883896)
+bones/27/rotation = Quaternion(-0.27370697, -0.10422729, -2.7939673e-09, 0.9561491)
+bones/29/rotation = Quaternion(-0.27723306, 0.15255524, 0.09142437, 0.9441983)
+bones/30/rotation = Quaternion(0.030931048, 0.36963034, 0.17959471, 0.91113245)
+bones/32/rotation = Quaternion(-0.018275164, -0.031728093, -0.39975294, 0.91589135)
+bones/34/rotation = Quaternion(0.0051585864, 0.39260212, -0.017444428, 0.91952854)
+bones/38/rotation = Quaternion(-0.011547789, 0.46120647, -0.0023623414, 0.88721466)
+bones/42/rotation = Quaternion(0.025781963, 0.5540655, -0.007516761, 0.8320398)
+bones/43/rotation = Quaternion(0.003174102, 0.2826848, 0.0001741133, 0.9592076)
+bones/46/rotation = Quaternion(0.016249187, 0.5889058, -0.016821243, 0.8078633)
+bones/47/rotation = Quaternion(0.024924865, 0.2613849, -0.0070670033, 0.9648869)
+
+[node name="shotgun" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot/weapon/model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4" parent_id_path=PackedInt32Array(1132056922, 2105025039, 220048450) index="2" unique_id=701048285]
+transform = Transform3D(0.9999618, -0.008734078, -0.00015371361, 0.008734397, 0.9999591, 0.0021960842, 0.00013452659, -0.0021973425, 0.9999975, 0, 4.5550747, 0.27914894)
+
+[node name="pump" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot/weapon/model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4/shotgun" index="4" unique_id=1791754828]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.881784e-16, 6.652055, 43.813236)
+
+[node name="L_arm_Pole" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot/weapon/model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4" parent_id_path=PackedInt32Array(1132056922, 2105025039, 220048450) index="3" unique_id=700848648]
+transform = Transform3D(-0.2136631, -0.93753725, 0.2745391, -0.9702684, 0.23636645, 0.052056625, -0.11369684, -0.2552541, -0.9601655, 24.212257, -11.878561, 7.412502)
+
+[node name="R_arm_Pole" parent="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot/weapon/model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4" parent_id_path=PackedInt32Array(1132056922, 2105025039, 220048450) index="4" unique_id=2097794222]
+transform = Transform3D(-0.31115973, 0.92984575, -0.1963835, 0.9449113, 0.32479024, 0.040667772, 0.1015982, -0.17291082, -0.9796834, -48.268993, -15.202788, -22.367065)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CameraPivot/Camera3D/WeaponHolder" unique_id=348767866]
 libraries/ak47 = SubResource("AnimationLibrary_tuyoq")
+libraries/benelli_m4 = SubResource("AnimationLibrary_fulsm")
 libraries/makarov_pistol = SubResource("AnimationLibrary_ur7pv")
 
-[node name="HitSound" type="AudioStreamPlayer2D" parent="CameraPivot/Camera3D/WeaponHolder" unique_id=512450530]
-stream = ExtResource("5_3v2ag")
-volume_db = -5.0
+[node name="Label" type="Label" parent="CameraPivot/Camera3D/WeaponHolder" unique_id=1278595134]
+visible = false
+offset_right = 155.0
+offset_bottom = 124.0
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="WallCheckRayCast3D" type="RayCast3D" parent="CameraPivot/Camera3D" unique_id=1786052948]
 target_position = Vector3(0, 0, -0.959)
+
+[node name="grenade_arms" parent="CameraPivot/Camera3D" unique_id=2054167381 instance=ExtResource("5_jej6c")]
+transform = Transform3D(-0.01, 0, -1.5099579e-09, 0, 0.010000001, 0, 1.5099579e-09, 0, -0.01, 0.065219045, -0.048817635, -0.40183067)
+visible = false
+
+[node name="model" parent="CameraPivot/Camera3D/grenade_arms" index="0" unique_id=332851641]
+transform = Transform3D(1, 0, 7.1054274e-15, 0, 1, 0, -7.1054274e-15, 0, 1, 1.9073486e-06, 0, -26.449665)
+
+[node name="AnimationPlayer" parent="CameraPivot/Camera3D/grenade_arms/model" index="1" unique_id=1422012068]
+libraries/ = SubResource("AnimationLibrary_60mlk")
+
+[node name="GrenadeAttachment" parent="CameraPivot/Camera3D/grenade_arms" index="1" unique_id=1274305953]
+transform = Transform3D(-0.72761697, -0.47501546, -0.49490833, -0.57768, 0.8133732, 0.06862933, 0.36994523, 0.33583447, -0.86623096, -13.923503, -8.528336, -32.503883)
+
+[node name="Grenade" parent="CameraPivot/Camera3D/grenade_arms/GrenadeAttachment" index="0" unique_id=110403833]
+visible = true
 
 [node name="ThirdPersonRig" type="Node3D" parent="." unique_id=1436114208]
 script = ExtResource("5_tuyoq")
@@ -464,10 +555,24 @@ text = "5"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[editable path="CameraPivot/Camera3D/WeaponHolder/grenade_arms"]
-[editable path="CameraPivot/Camera3D/WeaponHolder/grenade_arms/model"]
-[editable path="CameraPivot/Camera3D/WeaponHolder/grenade_arms/GrenadeAttachment/Grenade"]
+[node name="DamageSound" type="AudioStreamPlayer" parent="." unique_id=1860910518]
+unique_name_in_owner = true
+stream = ExtResource("15_qfm1y")
+
+[node name="HitSound" type="AudioStreamPlayer" parent="." unique_id=1468056030]
+unique_name_in_owner = true
+stream = ExtResource("5_3v2ag")
+volume_db = 5.0
+
+[node name="EarEcho" type="AudioStreamPlayer" parent="." unique_id=943156323]
+stream = ExtResource("15_oprun")
+volume_db = 7.5
+
 [editable path="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot/weapon"]
 [editable path="CameraPivot/Camera3D/WeaponHolder/BobPivot/RecoilPivot/weapon/model"]
+[editable path="CameraPivot/Camera3D/grenade_arms"]
+[editable path="CameraPivot/Camera3D/grenade_arms/model"]
+[editable path="CameraPivot/Camera3D/grenade_arms/GrenadeAttachment/Grenade"]
 [editable path="ThirdPersonRig/mesh"]
 [editable path="ThirdPersonRig/mesh/model"]
+[editable path="ThirdPersonRig/mesh/model/Skeleton3D/WeaponBoneAttachment/TiltPivot/weapon"]

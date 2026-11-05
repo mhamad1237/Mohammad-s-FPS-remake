@@ -1,8 +1,6 @@
-extends Control
+extends editable_control
 
 
-func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_STOP
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -16,6 +14,5 @@ func _gui_input(event: InputEvent) -> void:
 		return
 
 	accept_event()
-	print("grenade button tapped | player:", Global.player)
 	if is_instance_valid(Global.player):
 		Global.player.toggle_grenade()

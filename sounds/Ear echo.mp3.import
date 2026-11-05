@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://osnynl8nlikq"
+path="res://.godot/imported/Ear echo.mp3-8639dc0bf3a5b79ffb78470c5130f336.mp3str"
+
+[deps]
+
+source_file="res://sounds/Ear echo.mp3"
+dest_files=["res://.godot/imported/Ear echo.mp3-8639dc0bf3a5b79ffb78470c5130f336.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -8,7 +8,13 @@ var muzzle: Node3D = null
 @export var crouch_tilt_speed := 10.0
 var tilt_pivot : Node3D = null
 @onready var owner_player := get_parent()  # the CharacterBody3D this rig belongs to
+var _hand_grenade := false
+var _hand_weapon := true
+const BULLET_TRACER = preload("res://scenes/bullet_tracer.tscn")
+const TRACER_POOL_SIZE := 10
 
+var _tracer_pool: Array[Node3D] = []
+var _tracer_i := 0
 var tp_current_weapon_data: TpWeaponData = null
 var tps_scope: Node3D = null
 var tps_scope_mount: Node3D = null
@@ -24,7 +30,36 @@ func _ready() -> void:
 	set_hand_visibility(false, true)
 	equip_tps_weapon(TpWeaponPaths.makarov_pistol)
 
+	_init_tracer_pool()
+func _init_tracer_pool() -> void:
+	if not _tracer_pool.is_empty():
+		return
 
+	for i in TRACER_POOL_SIZE:
+		var t = BULLET_TRACER.instantiate()
+		t.visible = false
+		get_tree().root.add_child.call_deferred(t)
+		_tracer_pool.append(t)
+
+func spawn_tracer(to: Vector3) -> void:
+	if not is_instance_valid(tps_weapon):
+		push_warning("TP tracer: TPS weapon is missing")
+		return
+
+	if not is_instance_valid(muzzle):
+		push_warning("TP tracer: muzzle is missing")
+		return
+
+	if _tracer_pool.is_empty():
+		_init_tracer_pool()
+
+	var tracer := _tracer_pool[_tracer_i]
+	_tracer_i = (_tracer_i + 1) % TRACER_POOL_SIZE
+
+	var from := muzzle.global_position
+
+	tracer.setup(from, to)
+	tracer.show()
 
 func equip_tps_weapon(weapon_data: TpWeaponData) -> void:
 	if weapon_data == null or weapon_data.weapon_scene == null:
@@ -40,8 +75,7 @@ func equip_tps_weapon(weapon_data: TpWeaponData) -> void:
 		child.queue_free()
 	tps_weapon = null
 	muzzle = null
-	tps_weapon = null
-	muzzle = null
+
 
 	tp_current_weapon_data = weapon_data
 
@@ -66,7 +100,9 @@ func equip_tps_weapon(weapon_data: TpWeaponData) -> void:
 	if left_handle:
 		skeletonIK.stop()
 		skeletonIK.target_node = skeletonIK.get_path_to(left_handle)
-		skeletonIK.start()
+		if _hand_weapon:
+			skeletonIK.start()
+	set_hand_visibility(_hand_grenade, _hand_weapon)
 
 func equip_tps_scope(index: int) -> void:
 	tps_scope_index = index
@@ -88,6 +124,8 @@ func _process(delta: float) -> void:
 		clampf(crouch_tilt_speed * delta, 0.0, 1.0)
 	)
 func set_hand_visibility(grenade: bool, weapon: bool) -> void:
+	_hand_grenade = grenade
+	_hand_weapon = weapon
 	if grenade_mesh:
 		grenade_mesh.visible = grenade
 	if tilt_pivot:

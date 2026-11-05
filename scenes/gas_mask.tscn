@@ -5,6 +5,7 @@
 [ext_resource type="Animation" uid="uid://cyi4bjac3mfh2" path="res://animations/player/idle.res" id="2_4r5xc"]
 [ext_resource type="Animation" uid="uid://c58osxnm6movj" path="res://animations/player/crouch.res" id="2_bkqv1"]
 [ext_resource type="Animation" uid="uid://cs5tcqmrtip72" path="res://animations/player/idle_crouching.res" id="3_2raav"]
+[ext_resource type="PackedScene" uid="uid://cix8ov28rlc5s" path="res://scenes/benelli_m_4_tp.tscn" id="3_e6a66"]
 [ext_resource type="PackedScene" uid="uid://qy1x48fnt3m" path="res://models/grenade/low-poly_mk2_grenade.glb" id="3_eu70s"]
 [ext_resource type="Animation" uid="uid://bvpw7wjjohv2o" path="res://animations/player/idle_aiming.res" id="4_336tn"]
 [ext_resource type="Animation" uid="uid://c3yobhwx1xu10" path="res://animations/player/walk_backwards.res" id="4_tgmrs"]
@@ -477,7 +478,6 @@ animation = &"idle_crouching"
 animation = &"idle_crouching"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_g7b7a"]
-graph_offset = Vector2(370.55786, 116.02683)
 nodes/output/position = Vector2(1083.3333, 150)
 nodes/LocoRifle/node = SubResource("AnimationNodeStateMachine_fx5mn")
 nodes/LocoRifle/position = Vector2(-633.3333, 300)
@@ -575,6 +575,7 @@ transform = Transform3D(-0.020874739, -0.18316725, 0.9828602, 0.99849, -0.053785
 root_bone = &"mixamorig_LeftShoulder"
 tip_bone = &"mixamorig_LeftHand"
 override_tip_basis = false
+target_node = NodePath("../WeaponBoneAttachment/TiltPivot/weapon/handle")
 
 [node name="WeaponBoneAttachment" type="BoneAttachment3D" parent="model/Skeleton3D" index="2" unique_id=1220699561]
 transform = Transform3D(-0.16485278, 0.10195878, 0.98103416, 0.96467656, 0.22388405, 0.13883585, -0.20548248, 0.96926796, -0.1352653, -0.1680735, 1.2944026, 0.017765895)
@@ -582,6 +583,12 @@ bone_name = "mixamorig_RightHand"
 bone_idx = 34
 
 [node name="TiltPivot" type="Node3D" parent="model/Skeleton3D/WeaponBoneAttachment" unique_id=288746799]
+
+[node name="weapon" parent="model/Skeleton3D/WeaponBoneAttachment/TiltPivot" unique_id=1038961738 instance=ExtResource("3_e6a66")]
+transform = Transform3D(-0.069919184, 0.7385709, -0.11011092, 0.06770873, 0.116407424, 0.7378109, 0.7436579, 0.05884226, -0.07752898, -0.0984869, 0.38489845, -0.0154834995)
+
+[node name="handle" parent="model/Skeleton3D/WeaponBoneAttachment/TiltPivot/weapon" index="3" unique_id=981121009]
+transform = Transform3D(1.0000008, 2.910383e-09, -1.4901161e-08, 4.4237822e-08, 1.0000017, 5.5879354e-08, -5.5879354e-09, 7.450581e-09, 1.0000008, 0.10557039, 0.0407089, -0.010734081)
 
 [node name="Grenade" parent="model/Skeleton3D/WeaponBoneAttachment" unique_id=110403833 instance=ExtResource("3_eu70s")]
 transform = Transform3D(0.026, 7.2643154e-09, 9.080394e-10, -7.2643154e-09, 0.026, 0, -9.080394e-10, -2.5370328e-16, 0.026, 0.007596612, 0.091189, 0.019277677)
@@ -626,3 +633,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.046862133, 0.6722138, 0.06
 aabb = AABB(-0.28781632, -1.1532326, -0.3908885, 0.57563263, 2.3064651, 0.781777)
 
 [editable path="model"]
+[editable path="model/Skeleton3D/WeaponBoneAttachment/TiltPivot/weapon"]

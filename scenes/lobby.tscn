@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://cjmmhbp1b5312" path="res://addons/StyleboxFancy/StyleBorder.gd" id="1_q60fs"]
 [ext_resource type="Script" uid="uid://bkl6g25jwb47h" path="res://addons/StyleboxFancy/StyleBoxFancy.gd" id="2_nqcc7"]
 [ext_resource type="PackedScene" uid="uid://cguqfk61v42xd" path="res://scenes/loading.tscn" id="4_nqcc7"]
+[ext_resource type="Script" uid="uid://cmc45j61w7s" path="res://scripts/select_patch.gd" id="4_pc087"]
 
 [sub_resource type="Resource" id="Resource_pc087"]
 script = ExtResource("1_q60fs")
@@ -25,7 +26,7 @@ script = ExtResource("2_nqcc7")
 color = Color(0.0015846869, 0, 0.10422378, 1)
 borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_pc087")])
 
-[sub_resource type="Resource" id="Resource_gyc6d"]
+[sub_resource type="Resource" id="Resource_dwnjj"]
 script = ExtResource("1_q60fs")
 width_left = 5
 width_top = 5
@@ -42,7 +43,7 @@ content_margin_right = -1.0
 content_margin_bottom = -1.0
 script = ExtResource("2_nqcc7")
 color = Color(0, 0, 0, 1)
-borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_gyc6d")])
+borders = Array[ExtResource("1_q60fs")]([SubResource("Resource_dwnjj")])
 corner_radius_top_left = 15
 corner_radius_top_right = 15
 corner_radius_bottom_right = 15
@@ -246,14 +247,30 @@ theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
 theme_override_styles/hover = SubResource("StyleBox_07nfq")
 text = "JOIN GAME"
 
-[node name="SingleplayerButton" type="Button" parent="MenuPanel" unique_id=2123450988]
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuPanel" unique_id=1939214425]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_font_sizes/font_size = 35
+
+[node name="SingleplayerButton" type="Button" parent="MenuPanel/HBoxContainer" unique_id=2123450988]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBox_g7b7a")
 theme_override_styles/pressed = SubResource("StyleBox_oipnb")
 theme_override_styles/hover = SubResource("StyleBox_yad6j")
 text = "PLAY SINGLEPLAYER"
+
+[node name="SelectPatch" type="Button" parent="MenuPanel/HBoxContainer" unique_id=468610546]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBox_g7b7a")
+theme_override_styles/pressed = SubResource("StyleBox_ncsg4")
+theme_override_styles/hover = SubResource("StyleBox_07nfq")
+text = "Update"
+script = ExtResource("4_pc087")
 
 [node name="SettingsButton" type="Button" parent="MenuPanel" unique_id=1091711067]
 layout_mode = 2
@@ -365,6 +382,7 @@ theme_override_styles/hover = SubResource("StyleBox_ncsg4")
 text = "LOADOUT"
 
 [node name="JoinPanel" type="Panel" parent="." unique_id=754476555]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

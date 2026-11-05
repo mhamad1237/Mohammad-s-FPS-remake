@@ -4,7 +4,8 @@ const SAVE_PATH := "user://loadout.cfg"
 
 var all_weapons: Array[WeaponData] = [
 	WeaponPaths.makarov_pistol,
-	WeaponPaths.ak47,   # your real constant names
+	WeaponPaths.ak47,
+	WeaponPaths.benelli_m4,
 ]
 var weapon_data: WeaponData
 var scope_index := -1   # -1 = no scope

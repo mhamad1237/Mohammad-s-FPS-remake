@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://c01cfikl2okxf" path="res://scenes/explosion.tscn" id="3_vhiwl"]
 [ext_resource type="AudioStream" uid="uid://qn0u6wm3x5rc" path="res://sounds/grenade-explosion-1.mp3" id="4_76ndk"]
 [ext_resource type="PackedScene" uid="uid://qy1x48fnt3m" path="res://models/grenade/low-poly_mk2_grenade.glb" id="4_snp8f"]
+[ext_resource type="AudioStream" uid="uid://osnynl8nlikq" path="res://sounds/Ear echo.mp3" id="5_snp8f"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vhiwl"]
 friction = 0.6
@@ -21,6 +22,7 @@ properties/1/spawn = true
 properties/1/replication_mode = 1
 
 [node name="grenade" type="RigidBody3D" unique_id=367834547]
+collision_layer = 2
 mass = 0.4
 physics_material_override = SubResource("PhysicsMaterial_vhiwl")
 continuous_cd = true
@@ -44,5 +46,8 @@ unit_size = 50.0
 
 [node name="model" parent="." unique_id=110403833 instance=ExtResource("4_snp8f")]
 transform = Transform3D(0.045, 0, 0, 0, 0.045, 0, 0, 0, 0.045, 0, 0, 0)
+
+[node name="EarEcho" type="AudioStreamPlayer" parent="." unique_id=593000257]
+stream = ExtResource("5_snp8f")
 
 [editable path="model"]

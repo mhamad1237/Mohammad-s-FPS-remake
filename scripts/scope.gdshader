@@ -1,8 +1,7 @@
 shader_type spatial;
 render_mode unshaded, blend_mix, cull_back, depth_draw_opaque, shadows_disabled;
-
-uniform sampler2D reticle_texture : source_color, repeat_disable;
-uniform sampler2D scope_texture : source_color, repeat_disable;
+uniform sampler2D reticle_texture : source_color, filter_linear_mipmap, repeat_disable;
+uniform sampler2D scope_texture : source_color, filter_linear_mipmap, repeat_disable;
 uniform float scope_radius = 0.025;
 uniform bool scope_enabled = false;
 uniform float scope_brightness : hint_range(0.0, 2.0, 0.01) = 0.8;
@@ -21,9 +20,12 @@ void fragment() {
 	if (!scope_enabled) {
 		ALBEDO = vec3(0.0);
 	} else {
-		vec4 scope_sample = texture(scope_texture, UV);
-		vec4 reticle_sample = texture(reticle_texture, UV);
-		vec3 scope_rgb = scope_sample.rgb * scope_brightness;
-		ALBEDO = mix(scope_rgb, reticle_sample.rgb, reticle_sample.a);
+		vec2 uv = lens_view.xy / (scope_radius * 2.0) + 0.5;
+		uv.y = 1.0 - uv.y;
+
+		vec3 scope_rgb = texture(scope_texture, UV).rgb * scope_brightness;
+		vec4 reticle_sample = texture(reticle_texture, uv);
+		float a = smoothstep(0.35, 0.65, reticle_sample.a);
+		ALBEDO = mix(scope_rgb, reticle_sample.rgb, a);
 	}
 }

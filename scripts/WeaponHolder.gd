@@ -2,18 +2,32 @@
 # WeaponHolder.gd
 # ============================================================
 extends Node3D
+class_name WeaponHolder
+const START_BLEND := 0.1
+const SHELL_BLEND := 0.15
 var crosshair: Control
+
 var last_holder_bob_offset: Vector3 = Vector3.ZERO
 var tp_rig : Node3D = null
-@onready var grenade_arms: Node3D = get_node_or_null("grenade_arms")
-@onready var hand_grenade: Node3D = $grenade_arms/GrenadeAttachment/Grenade
-@onready var grenade_attachment: Node3D = $grenade_arms/GrenadeAttachment
-
+@export var grenade_arms: Node3D
+@export var grenade_attachment: Node3D
+var cancel_reload := false
+var is_equipping := false
 var _gren_ap: AnimationPlayer = null
 var _gren_anim := ""
 var _grenade_held := false
 var _grenade_hold_pos := 0.0
-
+enum ReloadPhase {
+	IDLE,
+	START,
+	INSERT_SHELL,
+	END
+}
+var iron_sight_alignment: Node3D = null
+var reload_phase := ReloadPhase.IDLE
+var _reload_generation := 0
+var _swap_token := 0   # bumped on every equip_weapon call so a stale hide-await can bail out
+var _fire_after_reload := false
 var wall_avoid_rotation: float = 0.0
 var _tracer_pool: Array[Node3D] = []
 const TRACER_POOL_SIZE := 10
@@ -103,6 +117,7 @@ const NO_SCOPE_NAME := "no_scope"
 var current_shot_bloom: float = 0.0
 
 signal weapon_fired
+signal weapon_changed
 
 func _ready() -> void:
 	if not is_multiplayer_authority():
@@ -113,10 +128,12 @@ func _ready() -> void:
 	
 	base_position = position
 	Global.weapon_holder = self
+	# First equip: no old weapon exists, so no hide plays.
 	equip_weapon(Loadout.weapon_data, Loadout.scope_index)
 	
 
 	await get_tree().process_frame
+	reset_grenade_fp_anim()
 	crosshair = Global.crosshair
 	player = Global.player
 	tp_rig = player.get_node("ThirdPersonRig")
@@ -172,12 +189,38 @@ func _warm_up_bullet_holes() -> void:
 
 
 ## Call this to swap weapons at runtime, e.g. equip_weapon(pistol_data)
-func equip_weapon(weapon_data: WeaponData, scope_index := -1) -> void:
+## play_hide: lower the current weapon with its "hide" state before swapping.
+## Skipped automatically when there is no current weapon (first equip).
+## Pass false on respawn so the player doesn't see a lowering animation.
+func equip_weapon(weapon_data: WeaponData, scope_index := -1, play_hide := true) -> void:
 
 	if not is_multiplayer_authority():
 		return
 	print("equip_weapon: ", weapon_data.weapon_name, " | type=", weapon_data.type)
-	if current_weapon:
+
+	_swap_token += 1
+	var swap_token := _swap_token
+
+	# Abort any running reload / fire BEFORE touching the old weapon,
+	# so reload loops bail out instead of fighting the hide clip.
+	_reload_generation += 1
+	is_reloading = false
+	cancel_reload = false
+	_fire_after_reload = false
+	is_firing = false
+	reload_phase = ReloadPhase.IDLE
+
+	# Lower the old weapon first.
+	if play_hide and is_instance_valid(current_weapon):
+		await play_weapon_anim("hide")
+		# A newer equip_weapon call took over while we were hiding.
+		if swap_token != _swap_token:
+			return
+
+	# Keep firing/reloading blocked across the swap (no gap after hide ends).
+	is_equipping = true
+
+	if is_instance_valid(current_weapon):
 		current_weapon.queue_free()
 
 	var existing_weapon := recoil_pivot.get_node_or_null("weapon")
@@ -185,6 +228,7 @@ func equip_weapon(weapon_data: WeaponData, scope_index := -1) -> void:
 		existing_weapon.queue_free()
 
 	current_weapon_data = weapon_data
+	weapon_changed.emit()
 	current_weapon = weapon_data.weapon_scene.instantiate()
 	# Set explicitly so the weapon's own guards never depend on inheritance
 	current_weapon.set_multiplayer_authority(get_multiplayer_authority())
@@ -206,17 +250,27 @@ func equip_weapon(weapon_data: WeaponData, scope_index := -1) -> void:
 	scope_crosshair = current_weapon.scope_crosshair
 
 	current_weapon.scope_changed.connect(func(i: int) -> void: Global.player.sync_scope.rpc(i))
+	current_weapon.ammo_reloaded.connect(_on_weapon_reloaded)
 	await get_tree().process_frame
 	await get_tree().process_frame
+	iron_sight_alignment = current_weapon.find_child("iron_sight_alignment", true, false) as Node3D
 	Global.player.sync_weapon.rpc(weapon_data.weapon_name, weapon_data.type)
 	Global.player.sync_scope.rpc(scope_index)
-	current_weapon.weapon_anim_player.play("equip")
+	is_equipping = true
+	var t := current_weapon.play_state("equip")
+	await get_tree().create_timer(t).timeout
+	is_equipping = false
 
 func apply_loadout_on_respawn() -> void:
 	is_firing = false
 	reset_grenade_fp()
 	hide_grenade_arms()
-	is_reloading = false   # a reload cut off by death never finishes
+	_reload_generation += 1
+
+	is_reloading = false
+	cancel_reload = false
+	_fire_after_reload = false
+	reload_phase = ReloadPhase.IDLE
 	if is_ads:
 		var anim := _get_ads_anim()
 		if animation_player and animation_player.has_animation(anim):
@@ -231,12 +285,14 @@ func apply_loadout_on_respawn() -> void:
 		or Loadout.weapon_data != current_weapon_data \
 		or Loadout.scope_index != current_weapon.current_scope_index
 	if changed:
-		equip_weapon(Loadout.weapon_data, Loadout.scope_index)
+		# false = no hide animation on respawn
+		equip_weapon(Loadout.weapon_data, Loadout.scope_index, false)
 	elif current_weapon_data:
 		current_ammo = current_weapon_data.magazine_size
-		if current_weapon and current_weapon.weapon_anim_player \
-		and current_weapon.weapon_anim_player.has_animation("equip"):
-			current_weapon.weapon_anim_player.play("equip")
+		is_equipping = true
+		var t := current_weapon.play_state("equip")
+		await get_tree().create_timer(t).timeout
+		is_equipping = false
 
 func _find_grenade_anim() -> bool:
 	_gren_ap = null
@@ -308,19 +364,29 @@ func resume_grenade_fp() -> void:
 	await get_tree().create_timer(maxf(length - pos, 0.0)).timeout
 
 
+func reset_grenade_fp_anim() -> void:
+	if not is_instance_valid(_gren_ap):
+		if not _find_grenade_anim():
+			return
+	_gren_ap.speed_scale = 1.0
+	_gren_ap.play(_gren_anim)
+	_gren_ap.seek(0.0, true)
+	_gren_ap.pause()
+
+
 func reset_grenade_fp() -> void:
 	_grenade_held = false
-	if is_instance_valid(_gren_ap):
-		_gren_ap.speed_scale = 1.0
 
 
 
 func show_grenade_arms() -> void:
+	_grenade_held = false
+
 	if bob_pivot:
 		bob_pivot.hide()
+
 	if grenade_arms:
 		grenade_arms.show()
-
 
 func hide_grenade_arms() -> void:
 	if grenade_arms:
@@ -342,10 +408,12 @@ func unequip_grenade() -> void:
 func _physics_process(_delta: float) -> void:
 	process_weapon_input()
 func process_weapon_input() -> void:
-	if not current_weapon or current_weapon.weapon_anim_player == null:
-		return
-
+	if not current_weapon or is_equipping: return
 	if is_reloading:
+		if current_weapon_data.is_shotgun \
+		and Input.is_action_just_pressed("fire"):
+			cancel_reload = true
+			_fire_after_reload = true
 		return
 	if player and player._throwing:
 		return
@@ -383,43 +451,199 @@ func process_weapon_input() -> void:
 	if Input.is_action_just_pressed("reload") \
 	and current_ammo < current_weapon_data.magazine_size:
 		start_reload()
-
-
-## Plays a weapon animation and waits for its full length.
-## Returns right away if the animation doesn't exist.
-func play_weapon_anim(anim_name: String) -> void:
-	var ap := current_weapon.weapon_anim_player if current_weapon else null
-	if ap == null or not ap.has_animation(anim_name):
+func play_weapon_anim(state: String) -> void:
+	if current_weapon == null:
 		return
-	ap.speed_scale = 1.0
-	ap.play(anim_name)
-	var length := ap.get_animation(anim_name).length / maxf(ap.speed_scale, 0.01)
-	await get_tree().create_timer(length).timeout
+	var length := current_weapon.play_state(state)
+	if length > 0.0:
+		is_equipping = true
+		await get_tree().create_timer(length).timeout
+		is_equipping = false
+
+func _reload_is_current(w: WeaponBase, token: int) -> bool:
+	return (
+		token == _reload_generation
+		and is_instance_valid(w)
+		and current_weapon == w
+	)
+
 
 func start_reload() -> void:
+	if not current_weapon or not current_weapon_data:
+		return
+
+	if is_reloading:
+		return
+
+	if current_ammo >= current_weapon_data.magazine_size:
+		return
+
+	var w := current_weapon
+	var request_generation := _reload_generation
+
+	# Exit ADS before starting the reload.
 	if is_ads:
 		exit_ads()
-		await animation_player.animation_finished
+
+		if is_ads:
+			return
+
+		if animation_player and animation_player.is_playing():
+			await animation_player.animation_finished
+
+	# The weapon might have changed while exiting ADS.
+	if request_generation != _reload_generation:
+		return
+
+	if current_weapon != w:
+		return
+
+	_reload_generation += 1
+	var token := _reload_generation
+
 	is_reloading = true
-	_on_reload_start()
+	cancel_reload = false
+	_fire_after_reload = false
+
+	if current_weapon_data.is_shotgun:
+		await _shotgun_reload(w, current_weapon_data, token)
+	else:
+		await _magazine_reload(w, current_weapon_data, token)
 
 
-func _on_reload_start() -> void:
-	if current_weapon.weapon_anim_player and current_weapon.weapon_anim_player.has_animation("reload"):
-		current_weapon.weapon_anim_player.play("reload")
-		await current_weapon.weapon_anim_player.animation_finished
-	current_ammo = current_weapon_data.magazine_size
+func _magazine_reload(
+	w: WeaponBase,
+	d: WeaponData,
+	token: int
+) -> void:
+	reload_phase = ReloadPhase.START
+
+	var t := w.play_state("reload")
+
+	if t <= 0.0:
+		push_warning("Missing magazine reload animation")
+		await _finish_reload(w, token, false)
+		return
+
+	await get_tree().create_timer(t).timeout
+
+	if not _reload_is_current(w, token):
+		return
+
+	current_ammo = d.magazine_size
+
+	await _finish_reload(w, token, false)
+func _shotgun_reload(
+	w: WeaponBase,
+	d: WeaponData,
+	token: int
+) -> void:
+	reload_phase = ReloadPhase.START
+
+	var t := w.play_state("reload_start")
+
+	if t > 0.0:
+		await get_tree().create_timer(t).timeout
+
+	if not _reload_is_current(w, token):
+		return
+
+	var shell_index := 0
+
+	while current_ammo < d.magazine_size:
+
+		if cancel_reload and current_ammo > 0:
+			break
+
+		reload_phase = ReloadPhase.INSERT_SHELL
+
+		# Even shells play forward, odd shells play the same clip backwards.
+		var anim := "reload1" if shell_index % 2 == 0 else "reload2"
+
+		var ammo_before := current_ammo
+
+		t = w.play_state(anim)
+
+		if t <= 0.0 and anim == "reload2":
+			t = w.play_state("reload1")
+
+		if t <= 0.0:
+			push_warning("Missing shotgun shell animation: " + anim)
+			break
+
+		await get_tree().create_timer(t).timeout
+
+		if not _reload_is_current(w, token):
+			return
+
+		# Fallback: the clip has no reloaded() key, so add the shell here.
+		if current_ammo == ammo_before:
+			current_ammo = mini(current_ammo + 1, d.magazine_size)
+
+		shell_index += 1
+
+		if cancel_reload:
+			break
+
+	reload_phase = ReloadPhase.END
+
+	t = w.play_state("reload_end")
+
+	if t > 0.0:
+		await get_tree().create_timer(t).timeout
+
+	if not _reload_is_current(w, token):
+		return
+
+	await _finish_reload(w, token, true)
+func _on_weapon_reloaded() -> void:
+	if not is_reloading or current_weapon_data == null:
+		return
+	if current_weapon_data.is_shotgun:
+		current_ammo = mini(current_ammo + 1, current_weapon_data.magazine_size)
+	else:
+		current_ammo = current_weapon_data.magazine_size
+func _finish_reload(
+	w: WeaponBase,
+	token: int,
+	allow_queued_fire: bool
+) -> void:
+
+	if not _reload_is_current(w, token):
+		return
+
+	# Wait for the previous shot's fire-rate cooldown.
+	if allow_queued_fire \
+	and _fire_after_reload \
+	and fire_timer \
+	and not fire_timer.is_stopped():
+
+		await fire_timer.timeout
+
+	if not _reload_is_current(w, token):
+		return
+
+	var should_fire := (
+		allow_queued_fire
+		and _fire_after_reload
+		and current_ammo > 0
+	)
+
 	is_reloading = false
+	cancel_reload = false
+	_fire_after_reload = false
+	reload_phase = ReloadPhase.IDLE
 
+	if should_fire:
+		_fire_shot()
 func _fire_shot() -> void:
-	if current_weapon.weapon_anim_player.is_playing() or wall_check_ray.is_colliding() or player._grenade_equipped:
+	if is_equipping or wall_check_ray.is_colliding() or player._grenade_equipped or player._grenade_equipping:
 		return
 
 	if player.is_sprinting:
 		Input.action_release("sprint")
 		await get_tree().create_timer(0.2).timeout
 
-	fire_timer.start(current_weapon_data.fire_rate)
 	current_ammo -= 1
 
 	# Increase inaccuracy when firing.
@@ -431,11 +655,30 @@ func _fire_shot() -> void:
 	weapon_fired.emit()
 	_on_fire()
 
+	# Perform the shot.
 	if current_weapon_data.is_shotgun:
 		_do_shotgun_raycasts()
 	else:
 		_do_raycast()
 
+	# Play weapon cycling animation after firing.
+	var action_animation := ""
+
+	if current_weapon_data.type == "shotgun":
+		action_animation = "pump"
+	elif current_weapon_data.type == "sniper":
+		action_animation = "bolt_action"
+
+	# Wait for cycling animation before allowing another shot.
+	var cooldown := current_weapon_data.fire_rate
+
+	if not action_animation.is_empty():
+		await get_tree().create_timer(0.35).timeout
+		exit_ads()
+		var animation_length := current_weapon.play_state(action_animation)
+		cooldown = maxf(cooldown, animation_length)
+
+	fire_timer.start(cooldown)
 
 func _on_fire() -> void:
 	if shoot_sound:
@@ -450,12 +693,21 @@ func _on_fire() -> void:
 
 
 
-
 func _get_aim_transform() -> Transform3D:
-	if scope_crosshair and is_ads:
-		return scope_crosshair.global_transform
+	if is_ads and current_weapon:
+		if _get_scope_string() == NO_SCOPE_NAME:
+			# Iron sights: shoot from the alignment node.
+			if is_instance_valid(iron_sight_alignment):
+				return _clean_transform(iron_sight_alignment.global_transform)
+		elif scope_crosshair:
+			# Scoped: shoot from the scope crosshair.
+			return _clean_transform(scope_crosshair.global_transform)
 	return player.camera.global_transform
 
+
+## Holder/weapon scale would skew the ray direction, so strip it.
+func _clean_transform(t: Transform3D) -> Transform3D:
+	return Transform3D(t.basis.orthonormalized(), t.origin)
 
 func _raycast(from: Vector3, dir: Vector3, max_dist: float = 100.0) -> Dictionary:
 	var space_state := player.get_world_3d().direct_space_state
@@ -476,6 +728,7 @@ func _raycast(from: Vector3, dir: Vector3, max_dist: float = 100.0) -> Dictionar
 	)
 
 	spawn_tracer(muzzle.global_position, hit_position)
+	tp_rig.spawn_tracer(hit_position)
 
 	if debug_draw_rays and OS.is_debug_build():
 		_debug_draw_ray(from, to, result)
@@ -512,7 +765,6 @@ func _do_raycast() -> void:
 	if result:
 		if result.collider is CharacterBody3D:
 			_apply_hit(result, from)
-			$HitSound.play()
 	else:
 		print("missed")
 func spawn_tracer(from: Vector3, to: Vector3) -> void:
@@ -523,6 +775,7 @@ func spawn_tracer(from: Vector3, to: Vector3) -> void:
 	tracer.setup(from, to)
 
 func _do_shotgun_raycasts() -> void:
+	
 	var aim := _get_aim_transform()
 	var from := aim.origin
 
@@ -618,7 +871,7 @@ func _get_ads_anim() -> String:
 
 
 func enter_ads() -> void:
-	if is_ads or not animation_player or not current_weapon_data or  player.is_airborne or is_reloading or wall_check_ray.is_colliding() or current_weapon.weapon_anim_player.is_playing():
+	if is_ads or not animation_player or not current_weapon_data or  player.is_airborne or is_reloading or wall_check_ray.is_colliding() or is_equipping:
 		return
 	if player.is_sprinting:
 		Input.action_release("sprint")
@@ -823,6 +1076,7 @@ func _process(delta: float) -> void:
 		last_holder_bob_offset = bob_offset
 	else:
 		bob_timer =0.0
+	$Label.text = str(current_ammo)
 
 func apply_recoil() -> void:
 	var recoil_multiplier := 0.4 if is_ads else 1.0

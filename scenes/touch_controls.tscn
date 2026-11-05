@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://dyk5f6hjd3nxy"]
 
+[ext_resource type="Script" uid="uid://6ot21qdu5ykl" path="res://scripts/touch_controls.gd" id="1_1msjr"]
 [ext_resource type="Script" uid="uid://dehn4fb7ndb5x" path="res://scripts/joystick_base.gd" id="1_6wx45"]
 [ext_resource type="Script" uid="uid://doiqv1vil7qr0" path="res://scripts/gameplay_buttons.gd" id="1_notdv"]
 [ext_resource type="Script" uid="uid://e4jcoq26iuuo" path="res://scripts/look_area.gd" id="2_c1tq5"]
+[ext_resource type="Script" uid="uid://4wk47antco4" path="res://scripts/gameplay_margin_container.gd" id="2_qvs5h"]
 [ext_resource type="Texture2D" uid="uid://b88xnqw4sqs8n" path="res://models/textures/joystick_circle_pad_a.png" id="3_i7au1"]
 [ext_resource type="Texture2D" uid="uid://cwh8wiymhmbqx" path="res://models/textures/jump.png" id="3_notdv"]
 [ext_resource type="Texture2D" uid="uid://dy3mcotq4swj6" path="res://models/textures/crouch.png" id="5_c1tq5"]
@@ -24,6 +26,18 @@
 [ext_resource type="Texture2D" uid="uid://by08pfh88wtll" path="res://models/textures/grenade.png" id="21_qm8nq"]
 [ext_resource type="Script" uid="uid://di40il8m7meey" path="res://addons/godotx_health_bar/runtime/godotx_health_bar_style.gd" id="21_xlgkt"]
 [ext_resource type="Script" uid="uid://ej2416acryl2" path="res://scripts/HealthBinder.gd" id="22_byp8s"]
+[ext_resource type="Script" uid="uid://cjmmhbp1b5312" path="res://addons/StyleboxFancy/StyleBorder.gd" id="25_be51l"]
+[ext_resource type="Script" uid="uid://bkl6g25jwb47h" path="res://addons/StyleboxFancy/StyleBoxFancy.gd" id="26_dw1eh"]
+[ext_resource type="Script" uid="uid://c5e2nro88oyn5" path="res://scripts/current_weapon_panel.gd" id="27_dw1eh"]
+[ext_resource type="Texture2D" uid="uid://di2tuktv1j5m4" path="res://models/textures/330px-Benelli_M4_Super_90_silhouette.svg.png" id="28_jdrxa"]
+[ext_resource type="Texture2D" uid="uid://t23b6l5l1goo" path="res://models/textures/—Pngtree—vector cog wheel icon_4232107.png" id="30_vvk48"]
+[ext_resource type="Script" uid="uid://bb38f5qaf3f45" path="res://scripts/menu_button.gd" id="31_vvk48"]
+[ext_resource type="Script" uid="uid://dvl80r18n52fc" path="res://scripts/back_button.gd" id="32_dwnjj"]
+[ext_resource type="Script" uid="uid://q3p8hrek8euv" path="res://scripts/settings_button_ganeplay_menu.gd" id="32_ivd4l"]
+[ext_resource type="Script" uid="uid://chjj7o076m805" path="res://scripts/edit_controls_button.gd" id="32_ugvn5"]
+[ext_resource type="Script" uid="uid://b04cg8y7l0w33" path="res://scripts/save_button.gd" id="34_4wu6f"]
+[ext_resource type="Script" uid="uid://dyyt7bf0kwoa6" path="res://scripts/exit_button_editor.gd" id="35_r7qvi"]
+[ext_resource type="Script" uid="uid://euwaiq0nwwoc" path="res://scripts/reset_button_editor.gd" id="36_r7qvi"]
 
 [sub_resource type="Resource" id="Resource_g7b7a"]
 script = ExtResource("21_xlgkt")
@@ -31,18 +45,259 @@ roundness = 0.0
 fill_color = Color(0.98134905, 0.9994287, 0.9833346, 1)
 metadata/_custom_type_script = "uid://di40il8m7meey"
 
-[node name="touch_controls" type="CanvasLayer" unique_id=2048230818]
+[sub_resource type="Resource" id="Resource_qvs5h"]
+script = ExtResource("25_be51l")
+width_left = 4
+width_top = 4
+width_right = 4
+width_bottom = 4
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
 
-[node name="gameplay" type="Control" parent="." unique_id=1683330501]
+[sub_resource type="StyleBox" id="StyleBox_bpo87"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+draw_center = false
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_qvs5h")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_gyc6d"]
+script = ExtResource("25_be51l")
+width_left = 3
+width_top = 3
+width_right = 3
+width_bottom = 3
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_g7b7a"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0.002542825, 1.7296989e-08, 0.05602061, 1)
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_gyc6d")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_gyc6d"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0, 0, 0, 1)
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_q34om"]
+script = ExtResource("25_be51l")
+width_left = 2
+width_top = 2
+width_right = 2
+width_bottom = 2
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_k5h23"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+draw_center = false
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_q34om")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_pc087"]
+script = ExtResource("25_be51l")
+color = Color(0.46614927, 0.7135701, 0.9947174, 1)
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_dwnjj"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+script = ExtResource("26_dw1eh")
+color = Color(0.0015846869, 0, 0.10422378, 1)
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_pc087")])
+
+[sub_resource type="Resource" id="Resource_dwnjj"]
+script = ExtResource("25_be51l")
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_ivd4l"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_dwnjj")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_omrgh"]
+script = ExtResource("25_be51l")
+color = Color(0.13333334, 0.56078434, 0.972549, 1)
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_ugvn5"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_vo0b5"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_omrgh")])
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_hqkgv"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0, 0, 0, 1)
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="StyleBox" id="StyleBox_4wu6f"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0.13812661, 0.13812664, 0.13812661, 1)
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_dwnjj")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_r7qvi"]
+script = ExtResource("25_be51l")
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_qvs5h"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_r7qvi")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[sub_resource type="Resource" id="Resource_k5h23"]
+script = ExtResource("25_be51l")
+color = Color(0.13333334, 0.56078434, 0.972549, 1)
+width_left = 5
+width_top = 5
+width_right = 5
+width_bottom = 5
+metadata/_custom_type_script = "uid://cjmmhbp1b5312"
+
+[sub_resource type="StyleBox" id="StyleBox_q34om"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = -1.0
+content_margin_top = -1.0
+content_margin_right = -1.0
+content_margin_bottom = -1.0
+script = ExtResource("26_dw1eh")
+color = Color(0, 0, 0, 1)
+borders = Array[ExtResource("25_be51l")]([SubResource("Resource_k5h23")])
+metadata/_custom_type_script = "uid://bkl6g25jwb47h"
+
+[node name="touch_controls" type="CanvasLayer" unique_id=2048230818]
+script = ExtResource("1_1msjr")
+
+[node name="crosshair" type="Control" parent="." unique_id=1349123170]
 layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("17_7qoim")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2131147400]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_qvs5h")
+
+[node name="gameplay" type="Control" parent="MarginContainer" unique_id=1683330501]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_notdv")
 
-[node name="look_area" type="Control" parent="gameplay" unique_id=920906172]
+[node name="look_area" type="Control" parent="MarginContainer/gameplay" unique_id=920906172]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -57,7 +312,7 @@ grow_vertical = 2
 script = ExtResource("2_c1tq5")
 sensitivity = 0.5
 
-[node name="JoystickBase" type="TextureRect" parent="gameplay" unique_id=604010266]
+[node name="JoystickBase" type="TextureRect" parent="MarginContainer/gameplay" unique_id=604010266]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.054999996
@@ -75,7 +330,7 @@ script = ExtResource("1_6wx45")
 knob_path = NodePath("JoystickKnob")
 metadata/_edit_use_anchors_ = true
 
-[node name="JoystickKnob" type="TextureRect" parent="gameplay/JoystickBase" unique_id=35634050]
+[node name="JoystickKnob" type="TextureRect" parent="MarginContainer/gameplay/JoystickBase" unique_id=35634050]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -92,279 +347,7 @@ mouse_filter = 2
 texture = ExtResource("5_lkmae")
 expand_mode = 1
 
-[node name="jump" type="Control" parent="gameplay" unique_id=1910985126]
-layout_mode = 1
-anchor_left = 0.882
-anchor_top = 0.5
-anchor_right = 0.882
-anchor_bottom = 0.5
-offset_left = 0.039916992
-offset_top = -3.0
-offset_right = 40.039917
-offset_bottom = 37.0
-script = ExtResource("6_j2vku")
-
-[node name="TextureRect" type="TextureRect" parent="gameplay/jump" unique_id=257512843]
-z_index = -1
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.407
-anchor_bottom = 0.407
-offset_left = -15.0
-offset_top = -11.279999
-offset_right = 137.0
-offset_bottom = 139.72
-texture = ExtResource("8_j2vku")
-expand_mode = 1
-
-[node name="TextureRect2" type="TextureRect" parent="gameplay/jump" unique_id=482224763]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.27800003
-anchor_top = 0.65000004
-anchor_right = 0.27800003
-anchor_bottom = 0.65000004
-offset_left = -19.11997
-offset_top = -33.000008
-offset_right = 118.88003
-offset_bottom = 155.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("3_notdv")
-expand_mode = 1
-
-[node name="crouch" type="Control" parent="gameplay" unique_id=1068800047]
-layout_mode = 1
-anchor_left = 0.73700005
-anchor_top = 0.86700004
-anchor_right = 0.73700005
-anchor_bottom = 0.86700004
-offset_left = 0.6399536
-offset_top = -0.24005127
-offset_right = 40.639954
-offset_bottom = 39.75995
-script = ExtResource("9_tve8x")
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect" type="TextureRect" parent="gameplay/crouch" unique_id=1462227915]
-z_index = -1
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.825
-anchor_top = -1.1250001
-anchor_right = -0.825
-anchor_bottom = -1.1250001
-offset_top = -1.1444092e-05
-offset_right = 123.0
-offset_bottom = 122.999985
-texture = ExtResource("8_j2vku")
-expand_mode = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect2" type="TextureRect" parent="gameplay/crouch" unique_id=2069928874]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.125
-anchor_top = -0.52500004
-anchor_right = -0.125
-anchor_bottom = -0.52500004
-offset_top = -3.999998
-offset_right = 64.0
-offset_bottom = 92.0
-mouse_filter = 2
-texture = ExtResource("5_c1tq5")
-expand_mode = 1
-
-[node name="shoot" type="Control" parent="gameplay" unique_id=2051093079]
-layout_mode = 1
-anchor_left = 0.105000004
-anchor_top = 0.03477778
-anchor_right = 0.105000004
-anchor_bottom = 0.03477778
-offset_left = -0.40000916
-offset_top = -0.040000916
-offset_right = 39.59999
-offset_bottom = 39.96
-script = ExtResource("11_j3oes")
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect" type="TextureRect" parent="gameplay/shoot" unique_id=1365679274]
-layout_mode = 1
-offset_right = 171.0
-offset_bottom = 171.0
-texture = ExtResource("8_j2vku")
-
-[node name="TextureRect2" type="TextureRect" parent="gameplay/shoot" unique_id=546611184]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 0.725
-anchor_right = 0.5
-anchor_bottom = 0.725
-offset_left = -3.0
-offset_right = 121.0
-offset_bottom = 124.0
-mouse_filter = 2
-texture = ExtResource("12_pvbyl")
-expand_mode = 1
-
-[node name="reload" type="Control" parent="gameplay" unique_id=31181950]
-layout_mode = 1
-anchor_left = 0.6
-anchor_top = 0.8666667
-anchor_right = 0.6
-anchor_bottom = 0.8666667
-offset_right = 40.0
-offset_bottom = 40.0
-script = ExtResource("13_pvbyl")
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect2" type="TextureRect" parent="gameplay/reload" unique_id=1823494859]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.6
-anchor_top = -0.975
-anchor_right = -0.6
-anchor_bottom = -0.975
-offset_right = 127.0
-offset_bottom = 127.0
-texture = ExtResource("8_j2vku")
-
-[node name="TextureRect" type="TextureRect" parent="gameplay/reload" unique_id=1031206025]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.275
-anchor_top = -0.77500004
-anchor_right = -0.275
-anchor_bottom = -0.77500004
-offset_right = 106.0
-offset_bottom = 109.0
-mouse_filter = 2
-texture = ExtResource("13_4wpbc")
-expand_mode = 1
-
-[node name="sprint" type="Control" parent="gameplay" unique_id=686090053]
-layout_mode = 1
-anchor_left = 0.8953125
-anchor_top = 0.8041667
-anchor_right = 0.8953125
-anchor_bottom = 0.8041667
-offset_right = 40.0
-offset_bottom = 40.0
-script = ExtResource("15_s570s")
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect" type="TextureRect" parent="gameplay/sprint" unique_id=825614967]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.625
-anchor_top = -0.3
-anchor_right = -0.625
-anchor_bottom = -0.3
-offset_right = 125.0
-offset_bottom = 125.0
-texture = ExtResource("8_j2vku")
-expand_mode = 1
-
-[node name="TextureRect2" type="TextureRect" parent="gameplay/sprint" unique_id=1662317379]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.35000002
-anchor_bottom = 0.35000002
-offset_right = 76.0
-offset_bottom = 76.0
-mouse_filter = 2
-texture = ExtResource("16_7qoim")
-expand_mode = 1
-
-[node name="crosshair" type="Control" parent="gameplay" unique_id=1595908634]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("17_7qoim")
-
-[node name="aim" type="Control" parent="gameplay" unique_id=793229051]
-layout_mode = 1
-anchor_left = 0.7390625
-anchor_top = 0.072222225
-anchor_right = 0.73934376
-anchor_bottom = 0.072500005
-offset_right = 39.640015
-offset_bottom = 39.799995
-script = ExtResource("18_s5gem")
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect" type="TextureRect" parent="gameplay/aim" unique_id=1168796578]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = -0.675
-anchor_bottom = -0.675
-offset_right = 171.0
-offset_bottom = 171.0
-texture = ExtResource("8_j2vku")
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect2" type="TextureRect" parent="gameplay/aim" unique_id=164455247]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.86200005
-anchor_top = 0.25
-anchor_right = 0.86200005
-anchor_bottom = 0.25
-offset_left = 0.019996643
-offset_right = 102.02
-offset_bottom = 97.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("19_h0mma")
-metadata/_edit_use_anchors_ = true
-
-[node name="grenade" type="Control" parent="gameplay" unique_id=88813273]
-layout_mode = 1
-anchor_left = 0.87600005
-anchor_top = 0.272
-anchor_right = 0.87600005
-anchor_bottom = 0.272
-offset_left = -4.2800293
-offset_top = 0.1599884
-offset_right = 35.71997
-offset_bottom = 40.15999
-script = ExtResource("20_byp8s")
-
-[node name="TextureRect2" type="TextureRect" parent="gameplay/grenade" unique_id=797299886]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -0.075
-anchor_top = 0.4
-anchor_right = -0.075
-anchor_bottom = 0.45
-offset_right = 129.0
-offset_bottom = 127.0
-texture = ExtResource("8_j2vku")
-expand_mode = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect" type="TextureRect" parent="gameplay/grenade" unique_id=1171296974]
-layout_mode = 0
-offset_left = 29.0
-offset_top = 40.0
-offset_right = 98.0
-offset_bottom = 124.0
-mouse_filter = 2
-texture = ExtResource("21_qm8nq")
-expand_mode = 1
-
-[node name="GodotxHealthBarControl" type="Control" parent="gameplay" unique_id=934796149 groups=["hud"]]
+[node name="GodotxHealthBarControl" type="Control" parent="MarginContainer/gameplay" unique_id=934796149 groups=["hud"]]
 layout_mode = 1
 anchor_left = 0.42265624
 anchor_top = 0.9097222
@@ -379,5 +362,539 @@ style = SubResource("Resource_g7b7a")
 metadata/_custom_type_script = "uid://bxh4ngfdgcy1a"
 metadata/_edit_use_anchors_ = true
 
-[node name="Node" type="Node" parent="gameplay/GodotxHealthBarControl" unique_id=1372266517]
+[node name="Node" type="Node" parent="MarginContainer/gameplay/GodotxHealthBarControl" unique_id=1372266517]
 script = ExtResource("22_byp8s")
+
+[node name="grenade_equip" type="TextureRect" parent="MarginContainer/gameplay" unique_id=1171296974]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.92200005
+anchor_top = 0.386
+anchor_right = 0.92200005
+anchor_bottom = 0.386
+offset_left = -34.160034
+offset_top = -41.920013
+offset_right = 34.839966
+offset_bottom = 42.079987
+mouse_filter = 0
+texture = ExtResource("21_qm8nq")
+expand_mode = 1
+script = ExtResource("20_byp8s")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/gameplay/grenade_equip" unique_id=797299886]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.42000002
+anchor_top = -0.286
+anchor_right = -0.42000002
+anchor_bottom = -0.286
+offset_left = -3.0199986
+offset_top = 0.024002075
+offset_right = 125.98
+offset_bottom = 131.224
+texture = ExtResource("8_j2vku")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Outline" type="Panel" parent="MarginContainer/gameplay/grenade_equip" unique_id=1390474311]
+visible = false
+layout_mode = 0
+offset_left = -32.0
+offset_top = -24.0
+offset_right = 100.0
+offset_bottom = 104.0
+theme_override_styles/panel = SubResource("StyleBox_bpo87")
+
+[node name="aim" type="TextureRect" parent="MarginContainer/gameplay" unique_id=164455247]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.7103125
+anchor_top = 0.13961111
+anchor_right = 0.7103125
+anchor_bottom = 0.13961111
+offset_left = -51.200012
+offset_top = -48.520004
+offset_right = 50.799988
+offset_bottom = 48.479996
+mouse_filter = 0
+texture = ExtResource("19_h0mma")
+script = ExtResource("18_s5gem")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/gameplay/aim" unique_id=1168796578]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -85.5
+offset_top = -85.5
+offset_right = 85.5
+offset_bottom = 85.5
+texture = ExtResource("8_j2vku")
+metadata/_edit_use_anchors_ = true
+
+[node name="Outline" type="Panel" parent="MarginContainer/gameplay/aim" unique_id=246330343]
+visible = false
+layout_mode = 0
+offset_left = -34.99994
+offset_top = -36.999992
+offset_right = 136.00006
+offset_bottom = 134.0
+theme_override_styles/panel = SubResource("StyleBox_bpo87")
+
+[node name="sprint" type="TextureRect" parent="MarginContainer/gameplay" unique_id=1662317379]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.9250001
+anchor_top = 0.87600005
+anchor_right = 0.9250001
+anchor_bottom = 0.87600005
+offset_left = -38.000122
+offset_top = -37.72003
+offset_right = 37.999878
+offset_bottom = 38.27997
+mouse_filter = 0
+texture = ExtResource("16_7qoim")
+expand_mode = 1
+script = ExtResource("15_s570s")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/gameplay/sprint" unique_id=825614967]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.32900003
+anchor_top = -0.3
+anchor_right = -0.32900003
+anchor_bottom = -0.3
+offset_left = 0.0040016174
+offset_top = -3.1999989
+offset_right = 125.004
+offset_bottom = 121.8
+texture = ExtResource("8_j2vku")
+expand_mode = 1
+
+[node name="Outline" type="Panel" parent="MarginContainer/gameplay/sprint" unique_id=77535331]
+visible = false
+layout_mode = 0
+offset_left = -25.0
+offset_top = -26.0
+offset_right = 100.0
+offset_bottom = 99.0
+theme_override_styles/panel = SubResource("StyleBox_bpo87")
+
+[node name="reload" type="TextureRect" parent="MarginContainer/gameplay" unique_id=1031206025]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.633
+anchor_top = 0.89900005
+anchor_right = 0.633
+anchor_bottom = 0.89900005
+offset_left = -53.23999
+offset_top = -54.28003
+offset_right = 52.76001
+offset_bottom = 54.71997
+mouse_filter = 0
+texture = ExtResource("13_4wpbc")
+expand_mode = 1
+script = ExtResource("13_pvbyl")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/gameplay/reload" unique_id=1823494859]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.123
+anchor_top = -0.128
+anchor_right = -0.123
+anchor_bottom = -0.128
+offset_left = 0.038000107
+offset_top = 5.9520006
+offset_right = 127.038
+offset_bottom = 132.952
+texture = ExtResource("8_j2vku")
+
+[node name="Outline" type="Panel" parent="MarginContainer/gameplay/reload" unique_id=1533417670]
+visible = false
+layout_mode = 0
+offset_left = -13.0
+offset_top = -8.0
+offset_right = 114.0
+offset_bottom = 119.0
+theme_override_styles/panel = SubResource("StyleBox_bpo87")
+
+[node name="shoot" type="TextureRect" parent="MarginContainer/gameplay" unique_id=546611184]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.16600001
+anchor_top = 0.16100001
+anchor_right = 0.16600001
+anchor_bottom = 0.16100001
+offset_left = -61.48001
+offset_top = -61.920013
+offset_right = 62.51999
+offset_bottom = 62.079987
+mouse_filter = 0
+texture = ExtResource("12_pvbyl")
+expand_mode = 1
+script = ExtResource("11_j3oes")
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/gameplay/shoot" unique_id=1365679274]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.141
+anchor_top = -0.23400001
+anchor_right = -0.141
+anchor_bottom = -0.23400001
+offset_left = 0.48400116
+offset_top = 0.016000748
+offset_right = 171.48401
+offset_bottom = 171.016
+texture = ExtResource("8_j2vku")
+
+[node name="Outline" type="Panel" parent="MarginContainer/gameplay/shoot" unique_id=469999754]
+visible = false
+layout_mode = 0
+offset_left = -17.0
+offset_top = -29.0
+offset_right = 154.0
+offset_bottom = 142.0
+theme_override_styles/panel = SubResource("StyleBox_bpo87")
+
+[node name="crouch" type="TextureRect" parent="MarginContainer/gameplay" unique_id=2069928874]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75900006
+anchor_top = 0.89900005
+anchor_right = 0.75900006
+anchor_bottom = 0.89900005
+offset_left = -32.52008
+offset_top = -48.28003
+offset_right = 31.47992
+offset_bottom = 47.71997
+mouse_filter = 0
+texture = ExtResource("5_c1tq5")
+expand_mode = 1
+script = ExtResource("9_tve8x")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/gameplay/crouch" unique_id=1462227915]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.437
+anchor_top = -0.208
+anchor_right = -0.437
+anchor_bottom = -0.208
+offset_left = -0.031999588
+offset_top = -0.031999588
+offset_right = 122.968
+offset_bottom = 122.968
+texture = ExtResource("8_j2vku")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Outline" type="Panel" parent="MarginContainer/gameplay/crouch" unique_id=1455618838]
+visible = false
+layout_mode = 0
+offset_left = -32.0
+offset_top = -24.0
+offset_right = 100.0
+offset_bottom = 104.0
+theme_override_styles/panel = SubResource("StyleBox_bpo87")
+
+[node name="jump" type="TextureRect" parent="MarginContainer/gameplay" unique_id=482224763]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.93000007
+anchor_top = 0.61700004
+anchor_right = 0.93000007
+anchor_bottom = 0.61700004
+offset_left = -69.40015
+offset_top = -94.24002
+offset_right = 68.59985
+offset_bottom = 93.75998
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+texture = ExtResource("3_notdv")
+expand_mode = 1
+script = ExtResource("6_j2vku")
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/gameplay/jump" unique_id=257512843]
+z_index = -1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.029000001
+anchor_top = 0.064
+anchor_right = -0.029000001
+anchor_bottom = 0.064
+offset_left = -2.9979997
+offset_top = -0.03200054
+offset_right = 149.002
+offset_bottom = 150.968
+texture = ExtResource("8_j2vku")
+expand_mode = 1
+
+[node name="Outline" type="Panel" parent="MarginContainer/gameplay/jump" unique_id=1597264576]
+visible = false
+layout_mode = 0
+offset_left = -7.0
+offset_top = 12.0
+offset_right = 145.0
+offset_bottom = 163.0
+theme_override_styles/panel = SubResource("StyleBox_bpo87")
+
+[node name="CurrentWeapon" type="Panel" parent="MarginContainer/gameplay" unique_id=2024214061 groups=["hud"]]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -277.0
+offset_bottom = 178.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBox_g7b7a")
+script = ExtResource("27_dw1eh")
+grenade_icon = ExtResource("21_qm8nq")
+
+[node name="Ammo" type="Label" parent="MarginContainer/gameplay/CurrentWeapon" unique_id=928074096]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.057761732
+anchor_top = 0.8202247
+anchor_right = 0.06859206
+anchor_bottom = 0.8202247
+offset_right = 40.0
+offset_bottom = 23.0
+text = "30/30"
+metadata/_edit_use_anchors_ = true
+
+[node name="Grenades" type="HBoxContainer" parent="MarginContainer/gameplay/CurrentWeapon" unique_id=1589576246]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.9314079
+anchor_top = 0.93820226
+anchor_right = 0.97472924
+anchor_bottom = 0.96067417
+offset_left = -89.0
+offset_top = -25.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = -10
+metadata/_edit_use_anchors_ = true
+
+[node name="Icon" type="TextureRect" parent="MarginContainer/gameplay/CurrentWeapon" unique_id=685702171]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = -0.084269665
+offset_left = 31.0
+offset_top = 40.0
+offset_right = 243.0
+offset_bottom = 148.0
+texture = ExtResource("28_jdrxa")
+expand_mode = 1
+stretch_mode = 5
+metadata/_edit_use_anchors_ = true
+
+[node name="menu_button" type="Button" parent="MarginContainer/gameplay" unique_id=808584534 node_paths=PackedStringArray("menu", "back_button")]
+texture_filter = 1
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/normal = SubResource("StyleBox_gyc6d")
+icon = ExtResource("30_vvk48")
+icon_alignment = 1
+expand_icon = true
+script = ExtResource("31_vvk48")
+menu = NodePath("../../../menu")
+back_button = NodePath("../../../BackButton")
+
+[node name="Outline" type="Panel" parent="MarginContainer/gameplay/menu_button" unique_id=1120106529]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_k5h23")
+
+[node name="menu" type="Panel" parent="." unique_id=1006263162]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_dwnjj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="menu" unique_id=1292638151]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -223.5
+offset_top = -113.75
+offset_right = 223.5
+offset_bottom = 113.75
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="EditControlsButton" type="Button" parent="menu/VBoxContainer" unique_id=192563218 node_paths=PackedStringArray("touch_controls_manager", "controls_editor", "back_button", "gameplay_buttons")]
+z_index = 1
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBox_ivd4l")
+theme_override_styles/pressed = SubResource("StyleBox_ugvn5")
+theme_override_styles/hover = SubResource("StyleBox_vo0b5")
+text = "EDIT CONTROLS"
+script = ExtResource("32_ugvn5")
+touch_controls_manager = NodePath("../../..")
+controls_editor = NodePath("../../ControlsEditor")
+back_button = NodePath("../../../BackButton")
+gameplay_buttons = NodePath("../../../MarginContainer/gameplay")
+metadata/_edit_use_anchors_ = true
+
+[node name="SettingsButton" type="Button" parent="menu/VBoxContainer" unique_id=694645177 node_paths=PackedStringArray("back_button")]
+z_index = 1
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBox_ivd4l")
+theme_override_styles/pressed = SubResource("StyleBox_ugvn5")
+theme_override_styles/hover = SubResource("StyleBox_vo0b5")
+text = "SETTINGS"
+script = ExtResource("32_ivd4l")
+back_button = NodePath("../../../BackButton")
+metadata/_edit_use_anchors_ = true
+
+[node name="ControlsEditor" type="Panel" parent="menu" unique_id=1506938366]
+visible = false
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBox_hqkgv")
+
+[node name="Buttons" type="Panel" parent="menu/ControlsEditor" unique_id=884251223]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -170.0
+offset_right = 170.0
+offset_bottom = 282.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBox_4wu6f")
+
+[node name="SaveButton" type="Button" parent="menu/ControlsEditor/Buttons" unique_id=1269163069]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -54.0
+offset_right = 170.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBox_qvs5h")
+theme_override_styles/pressed = SubResource("StyleBox_q34om")
+text = "SAVE"
+script = ExtResource("34_4wu6f")
+
+[node name="ExitButton" type="Button" parent="menu/ControlsEditor/Buttons" unique_id=97392899 node_paths=PackedStringArray("back_button", "gameplay_buttons")]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -54.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBox_qvs5h")
+theme_override_styles/pressed = SubResource("StyleBox_q34om")
+theme_override_styles/hover = SubResource("StyleBox_q34om")
+text = "EXIT"
+script = ExtResource("35_r7qvi")
+back_button = NodePath("../../../../BackButton")
+gameplay_buttons = NodePath("../../../../MarginContainer/gameplay")
+
+[node name="ResetButton" type="Button" parent="menu/ControlsEditor/Buttons" unique_id=858171048]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.23529412
+anchor_top = 0.6312057
+anchor_right = 0.23529412
+anchor_bottom = 0.6312057
+offset_left = 5.0
+offset_right = 175.0
+offset_bottom = 54.0
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBox_qvs5h")
+theme_override_styles/pressed = SubResource("StyleBox_q34om")
+theme_override_styles/hover = SubResource("StyleBox_q34om")
+text = "RESET"
+script = ExtResource("36_r7qvi")
+metadata/_edit_use_anchors_ = true
+
+[node name="SizeSlider" type="HSlider" parent="menu/ControlsEditor/Buttons" unique_id=1945450371]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -126.5
+offset_top = -54.5
+offset_right = 126.5
+offset_bottom = 54.5
+grow_horizontal = 2
+grow_vertical = 2
+min_value = 0.5
+max_value = 2.0
+step = 0.05
+value = 0.5
+
+[node name="BackButton" type="Button" parent="." unique_id=173504099 node_paths=PackedStringArray("menu", "gameplay_buttons")]
+unique_name_in_owner = true
+visible = false
+z_index = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = -121.0
+offset_right = 291.0
+offset_bottom = -14.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBox_ivd4l")
+theme_override_styles/pressed = SubResource("StyleBox_ugvn5")
+theme_override_styles/hover = SubResource("StyleBox_vo0b5")
+text = "BACK"
+script = ExtResource("32_dwnjj")
+menu = NodePath("../menu")
+gameplay_buttons = NodePath("../MarginContainer/gameplay")
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="MarginContainer/gameplay/menu_button" to="MarginContainer/gameplay/menu_button" method="_on_pressed"]
+[connection signal="pressed" from="menu/VBoxContainer/EditControlsButton" to="menu/VBoxContainer/EditControlsButton" method="_on_pressed"]
+[connection signal="pressed" from="menu/ControlsEditor/Buttons/ExitButton" to="menu/ControlsEditor/Buttons/ExitButton" method="_on_pressed"]
+[connection signal="pressed" from="BackButton" to="BackButton" method="_on_pressed"]

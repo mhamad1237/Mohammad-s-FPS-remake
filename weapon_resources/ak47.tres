@@ -3,12 +3,16 @@
 [ext_resource type="Script" uid="uid://b3ttjw2qi1jnr" path="res://scripts/WeaponData.gd" id="1_7wa8m"]
 [ext_resource type="PackedScene" uid="uid://c6wgbq16al7qx" path="res://scenes/2x_scope.tscn" id="1_p6lk3"]
 [ext_resource type="PackedScene" uid="uid://bjl7mq13gtdsu" path="res://scenes/ak_47.tscn" id="2_esfdx"]
+[ext_resource type="Texture2D" uid="uid://do8qci04kym30" path="res://models/textures/81647.png" id="2_w3qvu"]
 
 [resource]
 script = ExtResource("1_7wa8m")
 weapon_scene = ExtResource("2_esfdx")
 hold_position = Vector3(0.094, -0.247, -0.17)
 weapon_name = "ak47"
+icon = ExtResource("2_w3qvu")
+icon_pos = Vector2(31, 0)
+icon_size = Vector2(246, 178)
 type = "rifle"
 damage = 15
 accuracy_multiplier = 1.25

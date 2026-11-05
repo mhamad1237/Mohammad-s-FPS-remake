@@ -35,7 +35,7 @@ func _ready():
 	$MenuPanel/LoadoutButton.pressed.connect(_open_loadout)
 	$RoomPanel/LoadoutButton.pressed.connect(_open_loadout)
 	NetworkManager.loading_overlay = loading_overlay
-	$MenuPanel/SingleplayerButton.pressed.connect(func() -> void:
+	$MenuPanel/HBoxContainer/SingleplayerButton.pressed.connect(func() -> void:
 		NetworkManager.start_singleplayer(name_edit.text))
 	NetworkManager.show_loading_overlay.connect(loading_overlay.begin)
 	loading_overlay.finished.connect(NetworkManager.proceed_to_game)

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cix8ov28rlc5s"]
+
+[ext_resource type="PackedScene" uid="uid://ds8ad22y3ejao" path="res://models/benelli_m4_tp/benelli_tp.gltf" id="1_vlfhv"]
+
+[node name="weapon" type="Node3D" unique_id=1038961738]
+
+[node name="benelli_tp" parent="." unique_id=266949971 instance=ExtResource("1_vlfhv")]
+transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, -0.39108288)
+
+[node name="muzzle" type="Node3D" parent="." unique_id=1036649155]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14323217, 0.49440336)
+
+[node name="ScopeMount" type="Node3D" parent="." unique_id=1362364118]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18484077, 0.05553174)
+
+[node name="handle" type="Node3D" parent="." unique_id=981121009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10557039, 0.0407089, -0.010734081)

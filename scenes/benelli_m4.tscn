@@ -1,0 +1,238 @@
+[gd_scene format=3 uid="uid://cexitlm80xya2"]
+
+[ext_resource type="Script" uid="uid://dagqa3a8vojwn" path="res://scripts/benelli_m_4.gd" id="1_8hqxb"]
+[ext_resource type="PackedScene" uid="uid://cxjmlxktlpc4r" path="res://models/benelli_M4/shotgun_animated.glb" id="1_uka3x"]
+[ext_resource type="Animation" uid="uid://duuwfuamlawvs" path="res://models/benelli_M4/all_anims.res" id="3_0hqt3"]
+[ext_resource type="Animation" uid="uid://bnwlct1rs75pn" path="res://models/benelli_M4/equip.res" id="4_8jxp8"]
+[ext_resource type="Animation" uid="uid://ck2lyfn1m3qhy" path="res://models/benelli_M4/hide.res" id="5_wu1ho"]
+[ext_resource type="Animation" uid="uid://d0hbrcsda8xri" path="res://models/benelli_M4/pump.res" id="6_2b1hi"]
+[ext_resource type="Animation" uid="uid://dvj5viaywcmlx" path="res://models/benelli_M4/ready.res" id="6_kjk6n"]
+[ext_resource type="Animation" uid="uid://crkag8y3r6qc3" path="res://models/benelli_M4/reload1.res" id="7_cc428"]
+[ext_resource type="Animation" uid="uid://c3nytbuf1krx2" path="res://models/benelli_M4/reload_end.res" id="8_cc428"]
+[ext_resource type="Animation" uid="uid://dykqvjv4crl5l" path="res://models/benelli_M4/reload_start.res" id="9_kjk6n"]
+[ext_resource type="Script" uid="uid://bdpp2tfxfnt44" path="res://scripts/animation_player_ak47.gd" id="11_wsp2n"]
+[ext_resource type="AudioStream" uid="uid://clnwgluu6vohm" path="res://sounds/pump.mp3" id="12_lf8fi"]
+[ext_resource type="AudioStream" uid="uid://5jql5uumpq3v" path="res://sounds/reload_benelli_m4.mp3" id="13_3x82f"]
+[ext_resource type="AudioStream" uid="uid://v77wog1wh0nb" path="res://sounds/shotgun-shot-sound.mp3" id="14_o6ym2"]
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_wsp2n"]
+_data = {
+&"all_anims": ExtResource("3_0hqt3"),
+&"equip": ExtResource("4_8jxp8"),
+&"hide": ExtResource("5_wu1ho"),
+&"pump": ExtResource("6_2b1hi"),
+&"ready": ExtResource("6_kjk6n"),
+&"reload1": ExtResource("7_cc428"),
+&"reload_end": ExtResource("8_cc428"),
+&"reload_start": ExtResource("9_kjk6n")
+}
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_kjk6n"]
+animation = &"equip"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2b1hi"]
+animation = &"hide"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_7m6xu"]
+animation = &"pump"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3x82f"]
+animation = &"equip"
+use_custom_timeline = true
+timeline_length = 0.933
+stretch_time_scale = true
+start_offset = 0.9320000000000022
+loop_mode = 0
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_6xaes"]
+animation = &"reload1"
+use_custom_timeline = true
+timeline_length = 0.7
+stretch_time_scale = true
+start_offset = 0.0
+loop_mode = 0
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cc428"]
+animation = &"reload1"
+use_custom_timeline = true
+timeline_length = 0.7
+stretch_time_scale = true
+start_offset = 0.0
+loop_mode = 0
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_wsp2n"]
+animation = &"reload_end"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_lf8fi"]
+animation = &"reload_start"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_3x82f"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_o6ym2"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_clkdd"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_0tn6v"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_t6asi"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_r11a3"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_58tmv"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_n08n1"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qnlet"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_3uvh4"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_dbjet"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ykl8w"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_erhki"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_nknl7"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_0ofex"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_1q446"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_kjk6n"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_2b1hi"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_6xaes"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_wsp2n"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_lf8fi"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_mi7y6"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_teq5m"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_e8qll"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_blotr"]
+xfade_time = 0.1
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ando0"]
+xfade_time = 0.1
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_dvsw6"]
+states/equip/node = SubResource("AnimationNodeAnimation_kjk6n")
+states/equip/position = Vector2(299.27795, 110.43514)
+states/hide/node = SubResource("AnimationNodeAnimation_2b1hi")
+states/hide/position = Vector2(363.03442, 297.40427)
+states/pump/node = SubResource("AnimationNodeAnimation_7m6xu")
+states/pump/position = Vector2(505.54297, 343.29425)
+states/ready/node = SubResource("AnimationNodeAnimation_3x82f")
+states/ready/position = Vector2(647.2096, 400.5782)
+states/reload1/node = SubResource("AnimationNodeAnimation_6xaes")
+states/reload1/position = Vector2(700.31146, 88.4907)
+states/reload2/node = SubResource("AnimationNodeAnimation_cc428")
+states/reload2/position = Vector2(798.39343, 191.36812)
+states/reload_end/node = SubResource("AnimationNodeAnimation_wsp2n")
+states/reload_end/position = Vector2(660.37006, 297.37698)
+states/reload_start/node = SubResource("AnimationNodeAnimation_lf8fi")
+states/reload_start/position = Vector2(441.1448, 159.6292)
+transitions = ["Start", "equip", SubResource("AnimationNodeStateMachineTransition_3x82f"), "equip", "reload_start", SubResource("AnimationNodeStateMachineTransition_o6ym2"), "equip", "reload1", SubResource("AnimationNodeStateMachineTransition_clkdd"), "reload_start", "reload1", SubResource("AnimationNodeStateMachineTransition_0tn6v"), "reload_start", "reload_end", SubResource("AnimationNodeStateMachineTransition_t6asi"), "reload1", "reload_end", SubResource("AnimationNodeStateMachineTransition_r11a3"), "reload_end", "reload_start", SubResource("AnimationNodeStateMachineTransition_58tmv"), "reload_end", "reload1", SubResource("AnimationNodeStateMachineTransition_n08n1"), "equip", "hide", SubResource("AnimationNodeStateMachineTransition_qnlet"), "reload_start", "hide", SubResource("AnimationNodeStateMachineTransition_3uvh4"), "reload1", "hide", SubResource("AnimationNodeStateMachineTransition_dbjet"), "reload_end", "hide", SubResource("AnimationNodeStateMachineTransition_ykl8w"), "hide", "equip", SubResource("AnimationNodeStateMachineTransition_erhki"), "reload_start", "equip", SubResource("AnimationNodeStateMachineTransition_nknl7"), "reload1", "equip", SubResource("AnimationNodeStateMachineTransition_0ofex"), "reload_end", "equip", SubResource("AnimationNodeStateMachineTransition_1q446"), "reload1", "reload2", SubResource("AnimationNodeStateMachineTransition_kjk6n"), "reload2", "reload1", SubResource("AnimationNodeStateMachineTransition_2b1hi"), "reload2", "reload_end", SubResource("AnimationNodeStateMachineTransition_6xaes"), "equip", "pump", SubResource("AnimationNodeStateMachineTransition_wsp2n"), "hide", "pump", SubResource("AnimationNodeStateMachineTransition_lf8fi"), "reload_end", "pump", SubResource("AnimationNodeStateMachineTransition_mi7y6"), "pump", "hide", SubResource("AnimationNodeStateMachineTransition_teq5m"), "pump", "equip", SubResource("AnimationNodeStateMachineTransition_e8qll"), "reload_end", "ready", SubResource("AnimationNodeStateMachineTransition_blotr"), "pump", "ready", SubResource("AnimationNodeStateMachineTransition_ando0")]
+graph_offset = Vector2(153.20966, 208.28415)
+
+[node name="weapon" type="Node3D" unique_id=1132056922 node_paths=PackedStringArray("anim_tree")]
+script = ExtResource("1_8hqxb")
+anim_tree = NodePath("model/AnimationTree")
+
+[node name="model" parent="." unique_id=2105025039 instance=ExtResource("1_uka3x")]
+transform = Transform3D(-0.01, 0, -8.7422775e-10, 0, 0.01, 0, 8.7422775e-10, 0, -0.01, 0, 0, 0)
+
+[node name="Skeleton3D" parent="model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4" parent_id_path=PackedInt32Array(2105025039, 220048450) index="0" unique_id=619822455]
+bones/1/position = Vector3(-7.697649, 1.0280528, -34.593525)
+bones/1/rotation = Quaternion(-0.1351373, 0.68120766, 0.7134814, -0.09294258)
+bones/2/rotation = Quaternion(0.56077826, -0.23582207, 0.66738176, 0.42955476)
+bones/3/rotation = Quaternion(-0.037583657, -0.031377964, -9.313226e-10, 0.99880075)
+bones/4/rotation = Quaternion(0.3126998, 0.074228846, -0.21780719, 0.92155796)
+bones/5/rotation = Quaternion(-0.21461925, 0.09441659, -0.099456094, 0.9670226)
+bones/6/rotation = Quaternion(-0.011695011, 0.03334492, -0.061064746, 0.99750817)
+bones/8/rotation = Quaternion(-0.13966468, -0.16808674, 0.4504514, 0.8656409)
+bones/9/rotation = Quaternion(-0.05083905, -0.48617354, 0.0028994672, 0.8723775)
+bones/10/rotation = Quaternion(-0.031492777, -0.14205636, -0.0045219203, 0.98934716)
+bones/12/rotation = Quaternion(0.09115515, -0.50904435, 0.4023528, 0.7554316)
+bones/13/rotation = Quaternion(0.022278978, -0.19479023, 0.0044256654, 0.9805819)
+bones/14/rotation = Quaternion(-0.011769776, -0.22174804, -0.0006359646, 0.97503287)
+bones/16/rotation = Quaternion(-0.46157593, 0.882797, -0.052115414, 0.0700077)
+bones/17/rotation = Quaternion(0.0322776, 0.82859915, 0.07501031, 0.55385476)
+bones/18/rotation = Quaternion(0.05117318, -0.24259396, 0.012980913, 0.96869034)
+bones/19/rotation = Quaternion(-0.006239116, 0.03477666, 0.0653898, 0.9972341)
+bones/21/rotation = Quaternion(0.17873585, 0.7648906, 0.10683465, 0.60957545)
+bones/22/rotation = Quaternion(-0.021291735, -0.1685633, -0.0034913504, 0.9854547)
+bones/23/rotation = Quaternion(0.022323426, -0.008567826, 0.013147473, 0.99962765)
+bones/25/position = Vector3(-32.969364, 12.20673, -42.694256)
+bones/25/rotation = Quaternion(0.89763355, 0.28391734, 0.312084, -0.12746961)
+bones/26/rotation = Quaternion(0.80408496, -0.24596505, -0.1620025, 0.5164337)
+bones/27/rotation = Quaternion(-0.17847985, 0.055372585, -4.656613e-09, 0.98238426)
+bones/29/rotation = Quaternion(-0.28229487, 0.15391895, 0.094840884, 0.9421379)
+bones/30/rotation = Quaternion(0.029344147, 0.39039063, 0.18250968, 0.9019004)
+bones/32/rotation = Quaternion(-0.018275166, -0.031728096, -0.39975297, 0.91589135)
+bones/33/rotation = Quaternion(0.00094594713, 0.5076195, -0.04912445, 0.8601793)
+bones/34/rotation = Quaternion(0.0054276837, 0.4067723, -0.017362585, 0.91334844)
+bones/38/rotation = Quaternion(-0.011518641, 0.47180817, -0.0025005923, 0.8816225)
+bones/42/rotation = Quaternion(0.02586144, 0.5629965, -0.0072385855, 0.82602286)
+bones/43/rotation = Quaternion(0.0031726512, 0.29013866, 0.00019880183, 0.9569794)
+bones/46/rotation = Quaternion(0.01650248, 0.60109246, -0.016572824, 0.7988372)
+
+[node name="shotgun" parent="model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4" parent_id_path=PackedInt32Array(2105025039, 220048450) index="2" unique_id=701048285]
+transform = Transform3D(0.3442872, 0.5867866, 0.7329033, -0.15422125, 0.80536956, -0.57235914, -0.92611104, 0.08402667, 0.36777356, -8.41062, -11.372491, -18.297745)
+
+[node name="lid" parent="model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4/shotgun" index="1" unique_id=1806294923]
+transform = Transform3D(1, -1.8431437e-17, 3.1973446e-35, 1.8431437e-17, 1, -1.7347235e-18, 0, 1.7347235e-18, 1, 6.661338e-16, 5.327324, 18.085556)
+
+[node name="slug" parent="model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4/shotgun" index="3" unique_id=379125079]
+transform = Transform3D(1, 1.4918622e-16, -2.7755576e-17, -1.4918622e-16, 1, 1.3877788e-17, 2.7755576e-17, -1.3877788e-17, 1, 2.220446e-15, 6.4979806, 23.882095)
+
+[node name="pump" parent="model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4/shotgun" index="4" unique_id=1791754828]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.3274703e-16, 6.652055, 43.813236)
+
+[node name="L_arm_Pole" parent="model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4" parent_id_path=PackedInt32Array(2105025039, 220048450) index="3" unique_id=700848648]
+transform = Transform3D(-0.2136631, -0.93753725, 0.2745391, -0.9702684, 0.23636645, 0.052056625, -0.11369684, -0.2552541, -0.9601655, 17.955807, -47.651104, -21.733776)
+
+[node name="R_arm_Pole" parent="model/Sketchfab_model/8bdf8e2acc094814968f9aed4ca2f36e_fbx/Object_2/RootNode/Object_4" parent_id_path=PackedInt32Array(2105025039, 220048450) index="4" unique_id=2097794222]
+transform = Transform3D(-0.31115973, 0.92984575, -0.1963835, 0.9449113, 0.32479024, 0.040667772, 0.1015982, -0.17291082, -0.9796834, -50.160023, -4.4900775, -11.952787)
+
+[node name="AnimationPlayer" parent="model" index="1" unique_id=828037856]
+libraries/ = SubResource("AnimationLibrary_wsp2n")
+script = ExtResource("11_wsp2n")
+bolt_sound = ExtResource("12_lf8fi")
+equip_sound = ExtResource("12_lf8fi")
+reload1 = ExtResource("13_3x82f")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="model/AnimationPlayer" index="0" unique_id=1999460765]
+volume_db = 10.0
+
+[node name="AnimationTree" type="AnimationTree" parent="model" unique_id=295930875]
+tree_root = SubResource("AnimationNodeStateMachine_dvsw6")
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="shoot_sound" type="AudioStreamPlayer3D" parent="." unique_id=751473131]
+stream = ExtResource("14_o6ym2")
+volume_db = -20.0
+
+[node name="muzzle" type="Marker3D" parent="." unique_id=1555997537]
+
+[node name="ScopeMount" type="Node3D" parent="." unique_id=223982157]
+
+[node name="iron_sight_alignment" type="Node3D" parent="." unique_id=1853729992]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0011391453, 0.18116745, -0.2866382)
+
+[editable path="model"]

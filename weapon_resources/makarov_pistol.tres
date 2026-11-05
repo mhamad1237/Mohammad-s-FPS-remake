@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://cv3vklmbiy2ib"]
 
+[ext_resource type="Texture2D" uid="uid://bem10seoj0xi7" path="res://models/textures/81647 (1).png" id="1_pcpqv"]
 [ext_resource type="Script" uid="uid://b3ttjw2qi1jnr" path="res://scripts/WeaponData.gd" id="1_ykcad"]
 [ext_resource type="PackedScene" uid="uid://dflob8hn1mkjf" path="res://scenes/makarov_pistol.tscn" id="2_n7f02"]
 
@@ -8,6 +9,9 @@ script = ExtResource("1_ykcad")
 weapon_scene = ExtResource("2_n7f02")
 hold_position = Vector3(0.08921905, -0.17381763, -0.086830646)
 weapon_name = "makarov_pistol"
+icon = ExtResource("1_pcpqv")
+icon_pos = Vector2(31, 40)
+icon_size = Vector2(212, 108)
 type = "pistol"
 fire_rate = 0.3
 damage = 35

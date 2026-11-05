@@ -5,7 +5,8 @@ const RADIUS := 8
 const MIN_DAMAGE_FRACTION := 0.1
 const GRENADE_INTERPOLATION_DELAY := 0.06
 const MAX_GRENADE_SNAPSHOTS := 12
-
+const SHAKE_RADIUS := 25.0   # beyond this, no shake at all
+const SHAKE_MAX := 0.9       # trauma added when standing on top of it
 var _grenade_snapshots: Array[Dictionary] = []
 
 var _last_recorded_position: Vector3 = Vector3.ZERO
@@ -175,12 +176,9 @@ func _explode() -> void:
 
 		if not space.intersect_ray(q).is_empty():
 			continue   # a wall is in the way
-		var hit := space.intersect_ray(q)
-		if not hit.is_empty():
-			print("blocked by: ", hit.collider); continue
-		print("damaging ", id, " owner_id=", owner_id)
+
 		var dmg := DAMAGE * lerpf(MIN_DAMAGE_FRACTION, 1.0, 1.0 - dist / RADIUS)
-		p._server_apply_damage(dmg, owner_id, true)
+		p._server_apply_damage(dmg, owner_id, true, center,true)
 
 	_explode_fx.rpc(center)
 	freeze = true
@@ -192,4 +190,11 @@ func _explode() -> void:
 func _explode_fx(pos: Vector3) -> void:
 	Explosion.spawn(get_tree().current_scene, pos)
 	$explosion_sound.play()
+
 	$model.hide()
+
+	var local := Global.player
+	if is_instance_valid(local) and not local.is_dead:
+		var d := local.global_position.distance_to(pos)
+		if d < SHAKE_RADIUS:
+			local.add_shake(SHAKE_MAX * (1.0 - d / SHAKE_RADIUS))

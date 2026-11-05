@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TpWeaponData" format=3 uid="uid://b310lrdlsqao5"]
+
+[ext_resource type="Script" uid="uid://cqhwp1jb1e4pg" path="res://scripts/tp_weapon_data.gd" id="1_l1oi7"]
+[ext_resource type="PackedScene" uid="uid://cix8ov28rlc5s" path="res://scenes/benelli_m_4_tp.tscn" id="2_sk1u4"]
+
+[resource]
+script = ExtResource("1_l1oi7")
+weapon_scene = ExtResource("2_sk1u4")
+hold_position = Vector3(-0.0984869, 0.38489845, -0.0154834995)
+hold_rotation_degrees = Vector3(-79.7, -125.1, 30.2)
+hold_scale = Vector3(0.7, 0.7, 0.7)
+metadata/_custom_type_script = "uid://cqhwp1jb1e4pg"

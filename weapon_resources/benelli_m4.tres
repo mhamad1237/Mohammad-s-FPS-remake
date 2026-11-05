@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://lv1bb7w14anv"]
+
+[ext_resource type="Texture2D" uid="uid://di2tuktv1j5m4" path="res://models/textures/330px-Benelli_M4_Super_90_silhouette.svg.png" id="1_ihos7"]
+[ext_resource type="Script" uid="uid://b3ttjw2qi1jnr" path="res://scripts/WeaponData.gd" id="1_jvquc"]
+[ext_resource type="PackedScene" uid="uid://cexitlm80xya2" path="res://scenes/benelli_m4.tscn" id="2_vtept"]
+
+[resource]
+script = ExtResource("1_jvquc")
+weapon_scene = ExtResource("2_vtept")
+hold_position = Vector3(0.094, -0.22768867, -0.14715661)
+weapon_name = "benelli_m4"
+icon = ExtResource("1_ihos7")
+icon_pos = Vector2(31, 25)
+icon_size = Vector2(212, 123)
+type = "shotgun"
+damage = 25
+magazine_size = 6
+is_shotgun = true
+SHELL_INSERT_AT = 0.33
+is_semi_auto = true
+bob_offset = Vector3(0.2, -0.05, -0.1)
+bob_rotation = Vector3(0, 90, 0)
+metadata/_custom_type_script = "uid://b3ttjw2qi1jnr"

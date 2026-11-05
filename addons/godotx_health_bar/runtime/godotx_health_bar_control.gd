@@ -1,5 +1,5 @@
 class_name GodotxHealthBarControl
-extends Control
+extends editable_control
 
 signal value_change_started(from_value: float, to_value: float)
 signal value_changed(new_value: float)

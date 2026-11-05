@@ -1,4 +1,4 @@
-extends Control
+extends editable_control
 
 
 func _gui_input(event: InputEvent) -> void:

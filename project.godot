@@ -34,18 +34,20 @@ settings/addon_root_folder="res://addons/debug_draw_3d"
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/size/mode=3
 window/frame_pacing/android/enable_frame_pacing=false
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/StyleboxFancy/plugin.cfg", "res://addons/control_shadows/plugin.cfg", "res://addons/godotx_health_bar/plugin.cfg", "res://addons/mergingmeshes/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/tube/plugin.cfg")
+enabled=PackedStringArray("res://addons/AndroidFilePicker/plugin.cfg", "res://addons/StyleboxFancy/plugin.cfg", "res://addons/control_shadows/plugin.cfg", "res://addons/godotx_health_bar/plugin.cfg", "res://addons/mergingmeshes/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/tube/plugin.cfg")
 
 [global_group]
 
 spawn_points=""
 hud=""
+touch_controls=""
 
 [input]
 
