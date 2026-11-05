@@ -1,60 +1,76 @@
-name: Build Godot iOS
+name: Build unsigned iOS IPA
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+env:
+  GODOT_VERSION: "4.7.1"
+  GODOT_CHANNEL: "stable"
+  PRESET_NAME: "iOS"     # must match the preset name in export_presets.cfg
+  APP_NAME: "mohammads_fps_remake"       # name used for the exported project / scheme
 
 jobs:
   build-ios:
     runs-on: macos-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          lfs: true
 
-      - name: Install Godot Engine
+      - name: Install Godot and export templates
         run: |
-          GODOT_VERSION="4.7-stable"
-          URL="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_macos.universal.zip"
-          curl -L -o godot.zip "$URL"
+          V="${GODOT_VERSION}-${GODOT_CHANNEL}"
+          BASE="https://github.com/godotengine/godot/releases/download/${V}"
+          curl -fsSL -o godot.zip "${BASE}/Godot_v${V}_macos.universal.zip"
+          curl -fsSL -o templates.tpz "${BASE}/Godot_v${V}_export_templates.tpz"
           unzip -q godot.zip
-          mv Godot.app /Applications/Godot.app
-          sudo ln -s /Applications/Godot.app/Contents/MacOS/Godot /usr/local/bin/godot
+          sudo mv Godot.app /Applications/Godot.app
+          T="$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.${GODOT_CHANNEL}"
+          mkdir -p "$T"
+          unzip -q templates.tpz -d tpl
+          mv tpl/templates/* "$T/"
 
-      - name: Install Export Templates
-        run: |
-          TEMPLATE_VERSION="4.7.stable"
-          TEMPLATE_URL="https://github.com/godotengine/godot/releases/download/${TEMPLATE_VERSION}/Godot_v${TEMPLATE_VERSION}_export_templates.tpz"
-          
-          mkdir -p ~/Library/Application\ Support/Godot/export_templates/${TEMPLATE_VERSION}
-          curl -L -o templates.tpz "$TEMPLATE_URL"
-          unzip -q templates.tpz
-          mv templates/* ~/Library/Application\ Support/Godot/export_templates/${TEMPLATE_VERSION}/
+      - name: Import project
+        run: /Applications/Godot.app/Contents/MacOS/Godot --headless --import || true
 
-      - name: Export Project to Xcode
+      - name: Export Xcode project
         run: |
           mkdir -p build/ios
-          godot --headless --export-release "iOS" build/ios/GameOutput.xcodeproj
+          # Godot tries to build/sign the IPA itself and will fail without
+          # signing credentials, but it generates the Xcode project first.
+          /Applications/Godot.app/Contents/MacOS/Godot --headless \
+            --export-release "${PRESET_NAME}" "build/ios/${APP_NAME}.ipa" || true
+          ls -la build/ios
+          test -d "build/ios/${APP_NAME}.xcodeproj"
 
-      - name: Build Unsigned iOS Package via Xcode
+      - name: Build app without code signing
         run: |
-          cd build/ios
-          PROJECT_FILE=$(ls -d *.xcodeproj | head -n 1)
-          SCHEME_NAME=$(basename "$PROJECT_FILE" .xcodeproj)
-
-          xcodebuild -project "$PROJECT_FILE" \
-            -scheme "$SCHEME_NAME" \
+          xcodebuild \
+            -project "build/ios/${APP_NAME}.xcodeproj" \
+            -scheme "${APP_NAME}" \
             -configuration Release \
             -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath build \
-            build CODE_SIGNING_ALLOWED=NO
+            -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            build
 
-      - name: Upload Artifact
+      - name: Package unsigned IPA
+        run: |
+          APP=$(find build/dd/Build/Products -maxdepth 2 -name "*.app" | head -n 1)
+          echo "Found app: $APP"
+          rm -rf Payload && mkdir Payload
+          cp -R "$APP" Payload/
+          mkdir -p out
+          zip -qr "out/${APP_NAME}-unsigned.ipa" Payload
+
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build-output
-          path: build/ios/build/
+          name: ios-unsigned-ipa
+          path: out/*.ipa
+          if-no-files-found: error
